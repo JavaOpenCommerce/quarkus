@@ -11,13 +11,13 @@ import javax.enterprise.event.Observes;
 @JBossLog
 @QuarkusMain
 public class QuarkusApp {
-
+    // tag::main[]
     public static void main(String... args) {
         log.info("Starting quarkus application...");
         // Do not do business logic in #main method.
         Quarkus.run(args);
     }
-
+    // end::main[]
     void onStart(@Observes StartupEvent event) {
         log.info("Application started...");
     }

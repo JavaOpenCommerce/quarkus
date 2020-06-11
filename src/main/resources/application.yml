@@ -1,18 +1,26 @@
-<<<<<<< HEAD
 # Configuration file
 # key = value
 
-
 quarkus:
-
+  default-locale: pl-PL
+  oauth2:
+    enabled: false
   #datasource settings
   datasource:
+#    db-kind: H2
+#    username: test
+#    jdbc:
+#      url: "jdbc:h2:file:./testh2db;mv_store=false;FILE_LOCK=NO"
     url: vertx-reactive:postgresql://localhost:5432/main_postgres_db
     username: ${QUARKUS_DATASOURCE_USERNAME}
     password: ${QUARKUS_DATASOURCE_PASSWORD}
+  http:
+    auth:
+      permission:
+        authenticated:
+          paths: /profile/*
+          policy: authenticated
 
-#locale
-default-locale: pl-PL
 
 #custom properties
 com:
@@ -20,76 +28,40 @@ com:
     default-locale: pl
     elasticsearch-host: localhost
     elasticsearch-port: 9200
-    redis-host: localhost
-    redis-port: 6380
-=======
-# Configuration file
-# key = value
+    redis:
+#      connection: redis://:password@localhost:6380 ## if password is required use such connection string.
+      connection: redis://localhost:6380
+    oauth2:
+      client-id: ${GOOGLE_CLIENT_ID}
+      client-secret: ${GOOGLE_CLIENT_SECRET}
+
+    #      db-kind: postgresql
+#      jdbc:
+#        url: jdbc:postgresql://localhost:5432/main_postgres_db
+#      username: ${QUARKUS_DATASOURCE_USERNAME}
+#      password: ${QUARKUS_DATASOURCE_PASSWORD}
 
 
-  quarkus:
-    #datasource settings
-    datasource:
-      db-kind: postgresql
-      jdbc:
-        url: jdbc:postgresql://localhost:5432/main_postgres_db
-      username: ${QUARKUS_DATASOURCE_USERNAME}
-      password: ${QUARKUS_DATASOURCE_PASSWORD}
+#quarkus.oidc.tenant-enabled=false
+#quarkus.http.auth.permission.authenticated.paths=/profile/*
+#quarkus.http.auth.permission.authenticated.policy=authenticated
 
-    #hibernate settings
-    hibernate-orm:
-      database:
-        generation: drop-and-create
-      sql-load-script: data.sql
-      log:
-        sql: true
-
-    #Elastic search properties
-    hibernate-search:
-      automatic-indexing:
-        synchronization:
-          strategy: sync
-      schema-management:
-        strategy: drop-and-create
-      elasticsearch:
-        version: 7
-        index-defaults:
-          schema-management:
-            required-status: yellow
-        analysis:
-          configurer: com.example.elasticsearch.AnalysisConfigurer
-
-    #locale
-    default-locale: pl-PL
-
-  com:
-    example:
-      default-locale: pl
-      elasticsearch-host: localhost
-      elasticsearch-port: 9200
-
-
-quarkus.oidc.tenant-enabled=false
-quarkus.http.auth.permission.authenticated.paths=/profile/*
-quarkus.http.auth.permission.authenticated.policy=authenticated
-
-# %dev.quarkus.hibernate-orm.database.generation=drop-and-create
-# %dev.quarkus.hibernate-orm.sql-load-script=data.sql
-# %dev.quarkus.hibernate-orm.log.sql=true
+# %dev.quarkus.hibernate-orm.database.generation: drop-and-create
+# %dev.quarkus.hibernate-orm.sql-load-script: data.sql
+# %dev.quarkus.hibernate-orm.log.sql: true
 #
-# %prod.quarkus.hibernate-orm.database.generation = none
-# %prod.quarkus.hibernate-orm.sql-load-script = no-file
+# %prod.quarkus.hibernate-orm.database.generation :  none
+# %prod.quarkus.hibernate-orm.sql-load-script :  no-file
 
 #locale settings
-# quarkus.default-locale=pl-PL
-# com.example.default-locale=pl
+# quarkus.default-locale: pl-PL
+# com.example.default-locale: pl
 
 #h2 settings
-# quarkus.datasource.db-kind=h2
-# %dev.quarkus.datasource.username=test
-# %dev.quarkus.datasource.jdbc.url=jdbc:h2:file:./testh2db;mv_store=false;FILE_LOCK=NO
+# quarkus.datasource.db-kind: h2
+# %dev.quarkus.datasource.username: test
+# %dev.quarkus.datasource.jdbc.url: jdbc:h2:file:./testh2db;mv_store=false;FILE_LOCK=NO
 
-# %dev.quarkus.datasource.db-kind=h2
-# %dev.quarkus.datasource.username=sa
-# %dev.quarkus.datasource.jdbc.url=jdbc:h2:mem:default
->>>>>>> new: Example asciidoc documentation
+# %dev.quarkus.datasource.db-kind: h2
+# %dev.quarkus.datasource.username: sa
+# %dev.quarkus.datasource.jdbc.url: dbc:h2:mem:default

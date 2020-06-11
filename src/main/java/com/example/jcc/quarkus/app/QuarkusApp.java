@@ -25,4 +25,5 @@ public class QuarkusApp {
     void onStop(@Observes ShutdownEvent ev) {
         log.info("The application is stopping...");
     }
+
 }

@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'io.quarkus' version '1.4.2.Final'
+    id 'io.quarkus' version '1.7.0.Final'
     id 'io.freefair.lombok' //version '5.1.0'
     id 'org.asciidoctor.jvm.convert' //version '3.1.0'
 }
@@ -13,26 +13,20 @@ dependencies {
     // Web sockets is for remote debugging. Requires quarkus.live-reload.password & quarkus.live-reload.url properties
     // ./gradlew quarkusRemoteDev -Dquarkus.live-reload.url=http://my-remote-host:8080
     implementation 'io.quarkus:quarkus-undertow-websockets'
-    implementation 'io.quarkus:quarkus-hibernate-orm-panache'
-    implementation 'io.quarkus:quarkus-hibernate-search-elasticsearch'
-    implementation 'io.quarkus:quarkus-hibernate-validator'
-    implementation 'io.quarkus:quarkus-hibernate-orm'
-    implementation 'io.quarkus:quarkus-agroal'
+    implementation 'io.quarkus:quarkus-elytron-security-oauth2'
     implementation 'io.quarkus:quarkus-config-yaml'
     implementation 'io.quarkus:quarkus-reactive-pg-client'
-    //implementation 'io.quarkus:quarkus-oidc'
-    // For routing:
     implementation 'io.quarkus:quarkus-config-yaml'
     implementation 'io.quarkus:quarkus-vertx'
     implementation 'io.quarkus:quarkus-vertx-web'
-    implementation 'io.quarkus:quarkus-scala'
     implementation 'io.quarkus:quarkus-flyway'
-    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-redis-client'
+    implementation 'io.smallrye.reactive:smallrye-mutiny-vertx-redis-client'
     implementation 'io.quarkus:quarkus-resteasy-jsonb'
     implementation 'io.quarkus:quarkus-resteasy-mutiny'
-    implementation 'io.quarkus:quarkus-jdbc-h2'
-    implementation 'io.quarkus:quarkus-jdbc-postgresql'
     implementation 'io.smallrye.reactive:smallrye-mutiny-vertx-web-client'
+    implementation 'org.elasticsearch:elasticsearch:7.8.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
 
     // Testing deps:
     testImplementation 'io.quarkus:quarkus-junit5'

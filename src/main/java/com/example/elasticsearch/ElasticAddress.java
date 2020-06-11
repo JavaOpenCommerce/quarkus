@@ -10,8 +10,8 @@ import javax.enterprise.context.ApplicationScoped;
 public class ElasticAddress {
 
     @ConfigProperty(name = "com.example.elasticsearch-host")
-    private String host;
+    String host;
 
     @ConfigProperty(name = "com.example.elasticsearch-port")
-    private int port;
+    int port;
 }

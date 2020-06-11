@@ -36,6 +36,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         return client.preparedQuery("SELECT * FROM Item i " +
                                         "INNER JOIN Image img ON i.image_id = img.id " +
                                         "INNER JOIN item_category ON item_category.item_id = i.id ")
+                .execute()
                 .onItem().apply(rs -> getItems(rs));
     }
 
@@ -43,7 +44,8 @@ public class ItemRepositoryImpl implements ItemRepository {
     public Uni<Item> getItemById(Long id) {
         return client.preparedQuery("SELECT * FROM Item i " +
                                         "INNER JOIN Image img ON i.image_id = img.id " +
-                                        "WHERE i.id = $1", Tuple.of(id))
+                                        "WHERE i.id = $1")
+                .execute(Tuple.of(id))
                 .onItem().apply(rs -> {
                     if (rs == null || !rs.iterator().hasNext()) {
                         return Item.builder().build();
@@ -57,26 +59,29 @@ public class ItemRepositoryImpl implements ItemRepository {
         return client.preparedQuery("SELECT * FROM Item i " +
                                         "INNER JOIN Image img ON i.image_id = img.id " +
                                         "INNER JOIN item_category ON item_category.item_id = i.id " +
-                                        "WHERE i.id = ANY ($1) ORDER BY i.id DESC", Tuple.of(ids.toArray(new Long[ids.size()])))
+                                        "WHERE i.id = ANY ($1) ORDER BY i.id DESC")
+                .execute(Tuple.of(ids.toArray(new Long[ids.size()])))
                 .onItem().apply(rs -> getItems(rs));
     }
 
     @Override
     public Uni<List<ItemDetails>> getAllItemDetails() {
         return client.preparedQuery("SELECT * FROM ITEMDETAILS")
+                .execute()
                 .onItem().apply(rs -> getItemDetails(rs));
     }
 
     @Override
     public Uni<List<ItemDetails>> getItemDetailsListByItemId(Long id) {
-        return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = $1", Tuple.of(id))
+        return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = $1")
+                .execute(Tuple.of(id))
                 .onItem().apply(rs -> getItemDetails(rs));
     }
 
     @Override
     public Uni<List<ItemDetails>> getItemDetailsListByIdList(List<Long> ids) {
-        return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = ANY ($1)",
-                                        Tuple.of(ids.toArray(new Long[ids.size()])))
+        return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = ANY ($1)")
+                .execute(Tuple.of(ids.toArray(new Long[ids.size()])))
                 .onItem().apply(rs -> getItemDetails(rs));
     }
 

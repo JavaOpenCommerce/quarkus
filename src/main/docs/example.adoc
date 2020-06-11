@@ -1,4 +1,4 @@
-= Example Deck
+= Example Documentation, based on asciidocrj
 Doc Writer <doc.writer@example.org>
 2020-02-07
 :example-caption!:

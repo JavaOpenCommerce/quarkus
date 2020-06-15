@@ -3,20 +3,24 @@ package com.example.database.dao;
 import com.example.database.entity.OrderDetails;
 import com.example.database.entity.User;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Optional.ofNullable;
+
 public class UserDAO implements DAO<User> {
 
-    @Inject
-    EntityManager em;
+    private final EntityManager em;
+
+    public UserDAO(EntityManager em) {
+        this.em = em;
+    }
 
     @Override
     public Optional<User> getById(Long id) {
         User savedUser = em.find(User.class, id);
-        return Optional.ofNullable(savedUser);
+        return ofNullable(savedUser);
     }
 
     @Override

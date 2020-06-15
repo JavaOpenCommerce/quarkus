@@ -15,37 +15,40 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public Optional<User> getById(Long id) {
-        User user = em.find(User.class, id);
-        return Optional.ofNullable(user);
+        User savedUser = em.find(User.class, id);
+        return Optional.ofNullable(savedUser);
     }
 
     @Override
     public List<User> getAll() {
-        return null;
+        return em.createQuery("SELECT u FROM User u").getResultList();
     }
 
     @Override
     public void save(User user) {
-        em.persist(user);
-    }
-
-    @Override
-    public void update(User user) {
-
+        if (user.getId() == null) {
+            em.persist(user);
+        } else {
+            em.merge(user);
+        }
     }
 
     @Override
     public void delete(User user) {
-
+        if (em.contains(user)) {
+            em.remove(user);
+        }
     }
 
     @Override
     public void deleteById(Long id) {
-
+        em.createQuery("DELETE FROM User u WHERE u.id = :id")
+                .setParameter("id", id)
+                .executeUpdate();
     }
 
     public List<OrderDetails> getOrderHistoryByUserId(Long id) {
-        return em.createQuery("SELECT od FROM OrderDetails od WHERE od.user.id = :id")
+        return em.createQuery("SELECT od FROM OrderDetails od WHERE od.user.id = :id", OrderDetails.class)
                 .setParameter("id", id)
                 .getResultList();
     }

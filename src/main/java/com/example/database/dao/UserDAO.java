@@ -1,14 +1,17 @@
 package com.example.database.dao;
 
+import com.example.database.entity.Address;
 import com.example.database.entity.OrderDetails;
 import com.example.database.entity.User;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
+@ApplicationScoped
 public class UserDAO implements DAO<User> {
 
     private final EntityManager em;
@@ -19,8 +22,8 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public Optional<User> getById(Long id) {
-        User savedUser = em.find(User.class, id);
-        return ofNullable(savedUser);
+        User user = em.find(User.class, id);
+        return ofNullable(user);
     }
 
     @Override
@@ -29,11 +32,13 @@ public class UserDAO implements DAO<User> {
     }
 
     @Override
-    public void save(User user) {
+    public User save(User user) {
         if (user.getId() == null) {
             em.persist(user);
+            em.flush();
+            return user;
         } else {
-            em.merge(user);
+            return em.merge(user);
         }
     }
 
@@ -53,6 +58,12 @@ public class UserDAO implements DAO<User> {
 
     public List<OrderDetails> getOrderHistoryByUserId(Long id) {
         return em.createQuery("SELECT od FROM OrderDetails od WHERE od.user.id = :id", OrderDetails.class)
+                .setParameter("id", id)
+                .getResultList();
+    }
+    ;
+    public List<Address> getUserAddressListById(Long id) {
+        return em.createQuery("SELECT a FROM Address a WHERE a.user.id = :id", Address.class)
                 .setParameter("id", id)
                 .getResultList();
     }

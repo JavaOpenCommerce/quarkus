@@ -28,7 +28,7 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public List<User> getAll() {
-        return em.createQuery("SELECT u FROM User u").getResultList();
+        return em.createQuery("SELECT u FROM User u ORDER BY u.lastName").getResultList();
     }
 
     @Override
@@ -56,6 +56,12 @@ public class UserDAO implements DAO<User> {
                 .executeUpdate();
     }
 
+    public List<User> searchUserByEmail(String query) {
+        return em.createQuery("SELECT u FROM User u WHERE u.email LIKE :query")
+                .setParameter("query", query)
+                .getResultList();
+    }
+
     public List<OrderDetails> getOrderHistoryByUserId(Long id) {
         return em.createQuery("SELECT od FROM OrderDetails od WHERE od.user.id = :id", OrderDetails.class)
                 .setParameter("id", id)
@@ -66,5 +72,10 @@ public class UserDAO implements DAO<User> {
         return em.createQuery("SELECT a FROM Address a WHERE a.user.id = :id", Address.class)
                 .setParameter("id", id)
                 .getResultList();
+    }
+
+    public void addNewAddressToUser(Long userId, Address address) {
+        address.setId(userId);
+        em.persist(address);
     }
 }

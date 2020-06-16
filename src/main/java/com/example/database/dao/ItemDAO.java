@@ -24,7 +24,7 @@ public class ItemDAO implements DAO<Item> {
 
     @Override
     public List<Item> getAll() {
-        return em.createQuery("SELECT i FROM Item i")
+        return em.createQuery("SELECT i FROM Item i", Item.class)
                 .getResultList();
     }
 
@@ -51,5 +51,23 @@ public class ItemDAO implements DAO<Item> {
         em.createQuery("DELETE FROM Item i WHERE i.id = :id")
                 .setParameter("id", id)
                 .executeUpdate();
+    }
+
+    public List<Item> searchItemByName(String query) {
+        return em.createQuery("SELECT i FROM Item i WHERE i.name LIKE :query")
+                .setParameter("query","%" + query.trim() + "%")
+                .getResultList();
+    }
+
+    public List<Item> listItemByCategoryId(Long categoryId) {
+        return em.createQuery("SELECT i FROM Item i INNER JOIN i.category c WHERE c.id = :categoryId")
+                .setParameter("categoryId", categoryId)
+                .getResultList();
+    }
+
+    public List<Item> listItemByProducerId(Long producerId) {
+        return em.createQuery("SELECT i FROM Item i WHERE i.producer.id = :producerId")
+                .setParameter("producerId", producerId)
+                .getResultList();
     }
 }

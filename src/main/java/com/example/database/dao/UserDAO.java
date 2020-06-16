@@ -28,7 +28,8 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public List<User> getAll() {
-        return em.createQuery("SELECT u FROM User u ORDER BY u.lastName").getResultList();
+        return em.createQuery("SELECT u FROM User u ORDER BY u.lastName", User.class)
+                .getResultList();
     }
 
     @Override
@@ -57,8 +58,8 @@ public class UserDAO implements DAO<User> {
     }
 
     public List<User> searchUserByEmail(String query) {
-        return em.createQuery("SELECT u FROM User u WHERE u.email LIKE :query")
-                .setParameter("query", query)
+        return em.createQuery("SELECT u FROM User u WHERE u.email LIKE :query", User.class)
+                .setParameter("query", "%" + query.trim() + "%")
                 .getResultList();
     }
 

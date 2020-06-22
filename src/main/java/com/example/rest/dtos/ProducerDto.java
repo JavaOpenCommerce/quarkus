@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.util.Locale;
-
 @Getter
 @Builder
 @EqualsAndHashCode
@@ -15,5 +13,4 @@ public class ProducerDto {
     private String name;
     private String description;
     private ImageDto image;
-    private Locale lang;
 }

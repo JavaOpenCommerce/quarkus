@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.util.Locale;
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Getter
@@ -15,6 +15,12 @@ public class ItemDetailModel {
     private Long id;
     private String name;
     private String description;
-    private Locale lang;
+    private ImageModel mainImage;
+    private ProducerModel producer;
     private Set<ImageModel> additionalImages;
+    private BigDecimal valueGross;
+    private double vat;
+    private int stock;
+
+
 }

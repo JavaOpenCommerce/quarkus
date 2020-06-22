@@ -11,7 +11,7 @@ import java.util.Objects;
 @ApplicationScoped
 public class LanguageResolver {
 
-    @ConfigProperty(name = "com.example.default-locale")
+    @ConfigProperty(name = "default-locale")
     private String lang;
 
     private final RoutingContext context;
@@ -23,7 +23,7 @@ public class LanguageResolver {
 
         return languages.stream()
                 .filter(Objects::nonNull)
-                .map(l -> l.value().split("-")[0])
+                .map(l -> l.value())
                 .findFirst()
                 .orElse(lang);
     }

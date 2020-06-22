@@ -6,25 +6,26 @@ import com.example.database.entity.Address;
 import com.example.database.entity.Item;
 import com.example.database.repositories.AddressRepository;
 import com.example.database.repositories.ItemRepository;
+import com.example.utils.LanguageResolver;
 import com.example.utils.converters.AddressConverter;
 import com.example.utils.converters.ItemConverter;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CardService {
 
     private final ItemRepository itemRepository;
     private final AddressRepository addressRepository;
+    private final LanguageResolver languageResolver;
 
     public CardService(ItemRepository itemRepository,
-            AddressRepository addressRepository) {
+            AddressRepository addressRepository, LanguageResolver languageResolver) {
         this.itemRepository = itemRepository;
         this.addressRepository = addressRepository;
+        this.languageResolver = languageResolver;
     }
 
     public ItemModel getItemModel(Long id) {
@@ -33,17 +34,13 @@ public class CardService {
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
 
         return ItemConverter
-                .convertToModel(item);
+                .convertToModel(item, languageResolver.getLanguage(), languageResolver.getDefault());
     }
 
     public int checkItemStock(Long id) {
         Item item = itemRepository.findByIdOptional(id)
                 .orElseThrow(() ->
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
-
-        if (item.getStock() < 1) {
-            //todo handling, issue #6
-        }
 
         return item.getStock();
     }
@@ -55,12 +52,5 @@ public class CardService {
 
         return AddressConverter
                 .convertToModel(address);
-    }
-
-    public List<ItemModel> getShippingMethods() {
-        return itemRepository.getShippingMethodList().stream()
-                .map(i -> ItemConverter.convertToModel(i))
-                .collect(Collectors.toList());
-
     }
 }

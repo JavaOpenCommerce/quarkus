@@ -6,7 +6,6 @@ import com.example.rest.dtos.ItemDetailDto;
 import com.example.rest.dtos.ItemDto;
 import com.example.rest.dtos.PageDto;
 import com.example.rest.dtos.ProducerDto;
-import com.example.utils.LanguageResolver;
 import com.example.utils.converters.CategoryConverter;
 import com.example.utils.converters.ItemDetailConverter;
 import com.example.utils.converters.ItemPageConverter;
@@ -20,38 +19,27 @@ import java.util.stream.Collectors;
 public class StoreDtoService {
 
     private final StoreService storeService;
-    private final LanguageResolver langResolver;
 
-    public StoreDtoService(StoreService storeService, LanguageResolver langResolver) {
-        this.storeService = storeService;
-        this.langResolver = langResolver;
-    }
+    public StoreDtoService(StoreService storeService) {this.storeService = storeService;}
 
 
     public ItemDetailDto getItemById(Long id) {
-        return ItemDetailConverter
-                .convertToDto(storeService.getItemById(id), langResolver.getLanguage(), langResolver.getDefault());
+        return ItemDetailConverter.convertToDto(storeService.getItemDetailModel(id));
     }
 
-    public PageDto<ItemDto> getPageOfAllItems(int pageIndex, int pageSize) {
+    public PageDto<ItemDto> getAllItemsPage(int pageIndex, int pageSize) {
         return ItemPageConverter
-                .convertToDto(storeService.getPageOfAllItems(pageIndex, pageSize),
-                        langResolver.getLanguage(),
-                        langResolver.getDefault());
+                .convertToDto(storeService.getAllItemsPage(pageIndex, pageSize));
     }
 
     public PageDto<ItemDto> getItemsPageByCategory(Long categoryId, int pageIndex, int pageSize) {
         return ItemPageConverter
-                .convertToDto(storeService.getItemsPageByCategory(categoryId, pageIndex, pageSize),
-                        langResolver.getLanguage(),
-                        langResolver.getDefault());
+                .convertToDto(storeService.getItemsPageByCategory(categoryId, pageIndex, pageSize));
     }
 
     public PageDto<ItemDto> getItemsPageByProducer(Long producerId, int pageIndex, int pageSize) {
         return ItemPageConverter
-                .convertToDto(storeService.getItemsPageByProducer(producerId, pageIndex, pageSize),
-                        langResolver.getLanguage(),
-                        langResolver.getDefault());
+                .convertToDto(storeService.getItemsPageByProducer(producerId, pageIndex, pageSize));
     }
 
     public List<CategoryDto> getCategoryList() {

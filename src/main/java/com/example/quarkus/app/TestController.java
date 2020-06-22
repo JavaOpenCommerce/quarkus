@@ -2,10 +2,8 @@ package com.example.quarkus.app;
 
 import com.example.rest.dtos.CategoryDto;
 import com.example.rest.dtos.ItemDetailDto;
-import com.example.rest.dtos.ItemDto;
 import com.example.rest.dtos.PageDto;
 import com.example.rest.dtos.ProducerDto;
-import com.example.rest.services.CardDtoService;
 import com.example.rest.services.StoreDtoService;
 import com.example.utils.LanguageResolver;
 
@@ -24,20 +22,17 @@ import java.util.List;
 public class TestController {
 
 
-    private final StoreDtoService storeService;
-    private final CardDtoService cardService;
+    private final StoreDtoService service;
     private final LanguageResolver extractor;
 
-    public TestController(StoreDtoService service,
-            CardDtoService cardService, LanguageResolver extractor) {this.storeService = service;
-        this.cardService = cardService;
+    public TestController(StoreDtoService service, LanguageResolver extractor) {this.service = service;
         this.extractor = extractor;
     }
 
     @GET
     @Path("/items/{id}")
     public ItemDetailDto getItemById(@PathParam("id") Long id) {
-        return storeService.getItemById(id);
+        return service.getItemById(id);
     }
 
     @GET
@@ -45,7 +40,7 @@ public class TestController {
     public PageDto getAllByCategory(@PathParam("categoryId") Long id,
             @QueryParam("page") int page,
             @QueryParam("size") int size) {
-        return storeService.getItemsPageByCategory(id, page, size);
+        return service.getItemsPageByCategory(id, page, size);
     }
 
     @GET
@@ -53,32 +48,26 @@ public class TestController {
     public PageDto getAllByProducer(@PathParam("producerId") Long id,
             @QueryParam("page") int page,
             @QueryParam("size") int size) {
-        return storeService.getItemsPageByProducer(id, page, size);
+        return service.getItemsPageByProducer(id, page, size);
     }
 
     @GET
     @Path("/items")
     public PageDto getAll(@QueryParam("page") int page,
             @QueryParam("size") int size) {
-        return storeService.getPageOfAllItems(page, size);
+        return service.getAllItemsPage(page, size);
     }
 
     @GET
     @Path("/categories")
     public List<CategoryDto> getAllCategories() {
-        return storeService.getCategoryList();
+        return service.getCategoryList();
     }
 
     @GET
     @Path("/producers")
     public List<ProducerDto> getAllProducers() {
-        return storeService.getProducerList();
-    }
-
-    @GET
-    @Path("/shipping")
-    public List<ItemDto> getAllShippingMethods() {
-        return cardService.getShippingMethods();
+        return service.getProducerList();
     }
 
     @GET
@@ -86,5 +75,4 @@ public class TestController {
     public String getLocale() {
         return extractor.getLanguage();
     }
-
 }

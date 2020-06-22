@@ -2,6 +2,7 @@ package com.example.utils.converters;
 
 import com.example.business.models.ProducerModel;
 import com.example.database.entity.Producer;
+import com.example.rest.dtos.ProducerDto;
 
 public interface ProducerConverter {
 
@@ -10,7 +11,16 @@ public interface ProducerConverter {
                 .id(producer.getId())
                 .name(producer.getName())
                 .description(producer.getDescription())
-                .logoUrl(producer.getLogoUrl())
+                .image(ImageConverter.convertToModel(producer.getImage()))
+                .build();
+    }
+
+    static ProducerDto convertToDto(ProducerModel producer) {
+        return ProducerDto.builder()
+                .id(producer.getId())
+                .name(producer.getName())
+                .description(producer.getDescription())
+                .image(ImageConverter.convertToDto(producer.getImage()))
                 .build();
     }
 }

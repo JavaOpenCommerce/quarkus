@@ -3,14 +3,15 @@ package com.example.business.models;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @Builder
+@ToString
 @EqualsAndHashCode
-public class ProducerModel {
+public class ImageModel {
 
     private Long id;
-    private String name;
-    private String description;
-    private ImageModel image;
+    private String alt;
+    private String url;
 }

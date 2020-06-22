@@ -18,9 +18,9 @@ public class ItemModel {
 
     private final Long id;
     private final String name;
-    private final String description;
     private Value valueGross;
     private Vat vat;
-    private ProducerModel producerModel;
+    private ProducerModel producer;
+    private ImageModel image;
     private Set<CategoryModel> category;
 }

@@ -6,13 +6,15 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,13 +31,13 @@ import static javax.persistence.CascadeType.REFRESH;
 @EqualsAndHashCode(callSuper = true)
 public class Item extends BaseEntity {
 
-    private String name;
-
-    @Lob
-    private String description;
     private BigDecimal valueGross;
     private double vat;
     private int stock;
+
+    @OneToOne
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     @ManyToOne
     @JoinColumn(name = "producer_id")
@@ -47,5 +49,9 @@ public class Item extends BaseEntity {
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> category = new HashSet<>();
+
+    @Builder.Default
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "item", cascade = CascadeType.ALL)
+    private Set<ItemDetails> details = new HashSet<>();
 
 }

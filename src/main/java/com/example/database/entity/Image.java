@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 
 @Entity
 @Getter
@@ -16,12 +14,8 @@ import javax.persistence.OneToOne;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Producer extends BaseEntity {
+public class Image extends BaseEntity {
 
-    private String name;
-    private String description;
-
-    @OneToOne
-    @JoinColumn(name= "image_id")
-    private Image image;
+    private String alt;
+    private String url;
 }

@@ -19,14 +19,14 @@ public final class Product {
     private Amount amount;
 
 
-    private Product(ItemModel itemModel) {
-        this(itemModel, 1);
-    }
-
     private Product(ItemModel itemModel, int amount) {
         this.itemModel = itemModel;
         this.amount = Amount.of(amount);
         calculateSumValue();
+    }
+
+    private Product(ItemModel itemModel) {
+        this(itemModel, 1);
     }
 
     public static Product getProduct(ItemModel itemModel) {

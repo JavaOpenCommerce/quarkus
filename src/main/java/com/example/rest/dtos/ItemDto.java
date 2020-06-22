@@ -13,9 +13,9 @@ public class ItemDto {
 
     private final Long id;
     private final String name;
-    private final String description;
     private BigDecimal valueGross;
+    private ImageDto image;
     private double vat;
-    //private ProducerModel producerModel;
+    private ProducerDto producer;
 
 }

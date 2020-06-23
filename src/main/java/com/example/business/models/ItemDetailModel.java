@@ -1,5 +1,6 @@
 package com.example.business.models;
 
+import com.example.business.Vat;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class ItemDetailModel {
     private ProducerModel producer;
     private Set<ImageModel> additionalImages;
     private BigDecimal valueGross;
-    private double vat;
+    private Vat vat;
     private int stock;
 
 

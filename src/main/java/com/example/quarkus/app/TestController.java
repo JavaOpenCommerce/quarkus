@@ -55,7 +55,7 @@ public class TestController {
     @Path("/items")
     public PageDto getAll(@QueryParam("page") int page,
             @QueryParam("size") int size) {
-        return service.getAllItemsPage(page, size);
+        return service.getPageOfAllItems(page, size);
     }
 
     @GET

@@ -1,5 +1,7 @@
 package com.example.database.entity;
 
+
+import com.example.utils.LocaleConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -7,12 +9,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.util.Locale;
 import java.util.Set;
 
 @Entity
@@ -25,7 +29,8 @@ public class ItemDetails extends BaseEntity{
 
     private String name;
 
-    private String lang;
+    @Convert(converter = LocaleConverter.class)
+    private Locale lang;
 
     @Lob
     private String description;

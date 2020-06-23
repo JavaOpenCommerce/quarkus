@@ -42,6 +42,10 @@ public class CardService {
                 .orElseThrow(() ->
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
 
+        if (item.getStock() < 1) {
+            //todo handling, issue #6
+        }
+
         return item.getStock();
     }
 

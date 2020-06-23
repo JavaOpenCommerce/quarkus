@@ -1,5 +1,6 @@
 package com.example.utils.converters;
 
+import com.example.business.Vat;
 import com.example.business.models.ImageModel;
 import com.example.business.models.ItemDetailModel;
 import com.example.database.entity.Item;
@@ -7,6 +8,7 @@ import com.example.database.entity.ItemDetails;
 import com.example.rest.dtos.ImageDto;
 import com.example.rest.dtos.ItemDetailDto;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,7 +25,7 @@ public interface ItemDetailConverter {
         return ItemDetailModel.builder()
                 .id(item.getId())
                 .valueGross(item.getValueGross())
-                .vat(item.getVat())
+                .vat(Vat.of(item.getVat()))
                 .producer(ProducerConverter.convertToModel(item.getProducer()))
                 .stock(item.getStock())
                 .mainImage(ImageConverter.convertToModel(item.getImage()))
@@ -42,7 +44,7 @@ public interface ItemDetailConverter {
         return ItemDetailDto.builder()
                 .id(item.getId())
                 .valueGross(item.getValueGross())
-                .vat(item.getVat())
+                .vat(item.getVat().asDouble())
                 .producer(ProducerConverter.convertToDto(item.getProducer()))
                 .stock(item.getStock())
                 .mainImage(ImageConverter.convertToDto(item.getMainImage()))
@@ -55,10 +57,11 @@ public interface ItemDetailConverter {
     static ItemDetails getItemDetailsByLanguage(Item item, String lang, String defaultLang) {
 
         return item.getDetails().stream()
-                .filter(d -> d.getLang().equalsIgnoreCase(lang))
+                .filter(d -> Objects.nonNull(d.getLang()))
+                .filter(d -> d.getLang().getLanguage().equalsIgnoreCase(lang))
                 .findFirst()
                 .orElse(item.getDetails().stream()
-                        .filter(d -> d.getLang().equalsIgnoreCase(defaultLang))
+                        .filter(d -> d.getLang().getLanguage().equalsIgnoreCase(defaultLang))
                         .findFirst()
                         .orElse(ItemDetails.builder().name("Error").build()));
     }

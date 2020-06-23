@@ -64,7 +64,7 @@ public class StoreService {
                 .convertToModel(item, languageResolver.getLanguage(), languageResolver.getDefault());
     }
 
-    public PageModel<ItemModel> getAllItemsPage(int pageIndex, int pageSize) {
+    public PageModel<ItemModel> getPageOfAllItems(int pageIndex, int pageSize) {
         PanacheQuery<Item> page = itemRepository.getAll(pageIndex, pageSize);
         return getItemModelPage(pageIndex, pageSize, page);
     }
@@ -85,7 +85,7 @@ public class StoreService {
 
     private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, PanacheQuery<Item> itemPanacheQuery) {
         List<ItemModel> itemModels = itemPanacheQuery.list().stream()
-                .filter(i -> categoryCheck(i.getCategory()))
+                .filter(i -> validUserProductCategory(i.getCategory()))
                 .map(i -> ItemConverter.convertToModel(i, languageResolver.getLanguage(), languageResolver.getDefault()))
                 .collect(Collectors.toList());
 
@@ -98,7 +98,7 @@ public class StoreService {
                 .build();
     }
 
-    private boolean categoryCheck(Set<Category> categories) {
+    private boolean validUserProductCategory(Set<Category> categories) {
         for (Category cat : categories) {
             if ("Shipping".equalsIgnoreCase(cat.getCategoryName())) {
                 return false;

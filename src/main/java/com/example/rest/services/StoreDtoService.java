@@ -27,9 +27,9 @@ public class StoreDtoService {
         return ItemDetailConverter.convertToDto(storeService.getItemDetailModel(id));
     }
 
-    public PageDto<ItemDto> getAllItemsPage(int pageIndex, int pageSize) {
+    public PageDto<ItemDto> getPageOfAllItems(int pageIndex, int pageSize) {
         return ItemPageConverter
-                .convertToDto(storeService.getAllItemsPage(pageIndex, pageSize));
+                .convertToDto(storeService.getPageOfAllItems(pageIndex, pageSize));
     }
 
     public PageDto<ItemDto> getItemsPageByCategory(Long categoryId, int pageIndex, int pageSize) {

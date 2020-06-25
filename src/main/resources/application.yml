@@ -1,7 +1,7 @@
 # Configuration file
 # key = value
 
-
+"%dev":
   quarkus:
 
     #datasource settings
@@ -9,8 +9,8 @@
       db-kind: postgresql
       jdbc:
         url: jdbc:postgresql://localhost:5432/main_postgres_db
-      username: ${QUARKUS_DATASOURCE_USERNAME}
-      password: ${QUARKUS_DATASOURCE_PASSWORD}
+      username: testuser
+      password: testpass
 
     #hibernate settings
     hibernate-orm:
@@ -33,7 +33,7 @@
           schema-management:
             required-status: yellow
         analysis:
-          configurer: com.example.elasticsearch.AnalysisConfigurer
+          configurer: com.example.database.AnalysisConfigurer
 
     #locale
     default-locale: pl-PL
@@ -41,8 +41,7 @@
   com:
     example:
       default-locale: pl
-      elasticsearch-host: localhost
-      elasticsearch-port: 9200
+
 
 
 

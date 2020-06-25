@@ -10,8 +10,8 @@ services:
       memlock: -1
     restart: always
     environment:
-      - POSTGRES_USER=${QUARKUS_DATASOURCE_USERNAME}
-      - POSTGRES_PASSWORD=${QUARKUS_DATASOURCE_PASSWORD}
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpass
       - POSTGRES_DB=main_postgres_db
     networks:
       - com-example-network

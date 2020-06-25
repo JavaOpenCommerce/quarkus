@@ -13,6 +13,8 @@ import com.example.utils.converters.ItemConverter;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CardService {
@@ -56,5 +58,12 @@ public class CardService {
 
         return AddressConverter
                 .convertToModel(address);
+    }
+
+    public List<ItemModel> getShippingMethods() {
+        return itemRepository.getShippingMethodList().stream()
+                .map(i -> ItemConverter.convertToModel(i, languageResolver.getLanguage(), languageResolver.getDefault()))
+                .collect(Collectors.toList());
+
     }
 }

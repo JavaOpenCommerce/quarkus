@@ -29,6 +29,8 @@ public class SearchService {
     public PageModel<ItemModel> searchForAProduct(String pattern, int pageSize, int pageIndex) {
         SearchQuery<Item> itemSearchQuery = searchRepository.searchForAProduct(pattern);
 
+        System.out.println(itemSearchQuery.getQueryString());
+
         int pageCount = getPageCount(pageSize, itemSearchQuery.fetchTotalHitCount());
 
         List<ItemModel> items = itemSearchQuery.fetchHits(pageSize*pageIndex, pageSize).stream()
@@ -44,7 +46,7 @@ public class SearchService {
                 .build();
     }
 
-    public int getPageCount(int pageSize, long totalCount) {
+    private int getPageCount(int pageSize, long totalCount) {
         return (int) Math.ceil((double)totalCount/pageSize);
     }
 }

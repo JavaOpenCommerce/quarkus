@@ -33,4 +33,8 @@ public class ItemRepository implements PanacheRepository<Item> {
     public List<Item> searchItemByName(String query) {
         return list("name LIKE ?1", "%" + query.trim() + "%");
     }
+
+    public List<Item> getShippingMethodList() {
+        return list("SELECT i FROM Item i INNER JOIN i.category c WHERE c.categoryName = 'Shipping'");
+    }
 }

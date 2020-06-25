@@ -28,11 +28,11 @@ INSERT INTO ITEM VALUES ('6', '2', '2.45', '0.23', '6', '2');
 INSERT INTO ITEM VALUES ('7', '2', '1.45', '0.23', '7', '1');
 
 INSERT INTO ITEMDETAILS VALUES('1', 'shippingMethod', 'pl-PL', 'shipping', '1');
-INSERT INTO ITEMDETAILS VALUES('2', 'itemDescription', 'pl-PL', 'testItem1', '2');
-INSERT INTO ITEMDETAILS VALUES('3', 'itemDescription', 'pl-PL', 'testItem1', '3');
-INSERT INTO ITEMDETAILS VALUES('4', 'itemDescription', 'pl-PL', 'testItem1', '4');
-INSERT INTO ITEMDETAILS VALUES('5', 'itemDescription', 'pl-PL', 'testItem1', '5');
-INSERT INTO ITEMDETAILS VALUES('6', 'itemDescription', 'pl-PL', 'testItem1', '6');
+INSERT INTO ITEMDETAILS VALUES('2', 'itemDescription', 'pl-PL', 'testItem2', '2');
+INSERT INTO ITEMDETAILS VALUES('3', 'itemDescription', 'pl-PL', 'testItem3', '3');
+INSERT INTO ITEMDETAILS VALUES('4', 'itemDescription', 'pl-PL', 'testItem4', '4');
+INSERT INTO ITEMDETAILS VALUES('5', 'itemDescription', 'pl-PL', 'testItem5', '5');
+INSERT INTO ITEMDETAILS VALUES('6', 'itemDescription', 'pl-PL', 'testItem6', '6');
 INSERT INTO ITEMDETAILS VALUES('7', 'PL_itemDescription', 'pl-PL', 'PL_TestItem1', '7');
 INSERT INTO ITEMDETAILS VALUES('8', 'ENG_itemDescription', 'en-US', 'ENG_TestItem1', '7');
 INSERT INTO ITEMDETAILS VALUES('9', 'FR_itemDescription', 'fr-FR', 'FR_TestItem1', '7');

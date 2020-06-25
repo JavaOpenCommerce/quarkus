@@ -7,39 +7,46 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
 @Entity
+@Indexed
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true, exclude = "item")
-public class ItemDetails extends BaseEntity{
+@EqualsAndHashCode(callSuper = true, exclude = {"item", "images"})
+public class ItemDetails extends BaseEntity {
 
+    @FullTextField(analyzer = "item")
     private String name;
 
     @Convert(converter = LocaleConverter.class)
     private Locale lang;
 
-    @Lob
+    @FullTextField(analyzer = "item")
+    @Column(columnDefinition = "text")
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "item_id")
+    @JoinColumn
     private Item item;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Image> images;
+    private Set<Image> images = new HashSet<>();
 
 }

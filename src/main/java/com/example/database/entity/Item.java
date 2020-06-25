@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -24,6 +26,7 @@ import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.REFRESH;
 
 @Entity
+@Indexed
 @Getter
 @Builder
 @NoArgsConstructor
@@ -51,6 +54,7 @@ public class Item extends BaseEntity {
     private Set<Category> category = new HashSet<>();
 
     @Builder.Default
+    @IndexedEmbedded
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "item", cascade = CascadeType.ALL)
     private Set<ItemDetails> details = new HashSet<>();
 

@@ -27,8 +27,15 @@ public class SearchRepository {
     public SearchQuery<Item> searchForAProduct(String pattern) {
         return Search.session(em)
                 .search(Item.class)
-                .where(f -> pattern == null || pattern.trim().isEmpty() ? f.matchAll() : f.wildcard()
-                        .fields("details.name", "details.description")
-                        .matching("*" + pattern + "*")).toQuery();
+                .where(f -> pattern == null || pattern.trim().isEmpty() ? f.matchAll() : f.bool()
+                        .mustNot(
+                                f.match()
+                                        .field("category.categoryName")
+                                        .matching("Shipping"))
+                        .should(
+                                f.wildcard()
+                                        .fields("details.name", "details.description")
+                                        .matching("*" + pattern + "*"))).toQuery();
+
     }
 }

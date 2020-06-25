@@ -43,10 +43,12 @@ public class Item extends BaseEntity {
     private Image image;
 
     @ManyToOne
+    @IndexedEmbedded
     @JoinColumn(name = "producer_id")
     private Producer producer;
 
     @Builder.Default
+    @IndexedEmbedded
     @ManyToMany(cascade = {REFRESH, DETACH, MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "item_category",
             joinColumns = @JoinColumn(name = "item_id"),

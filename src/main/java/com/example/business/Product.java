@@ -43,7 +43,10 @@ public final class Product {
     }
 
     private void calculateSumValue() {
-        valueGross = Value.of(itemModel.getValueGross().asDecimal().multiply(amount.asDecimal(), MathContext.DECIMAL32));
-        valueNett = Value.of(valueGross.asDecimal().divide(itemModel.getVat().asDecimal().add(ONE), 2, RoundingMode.HALF_UP));
+        valueGross = Value.of(itemModel.getValueGross()
+                .asDecimal()
+                .multiply(amount.asDecimal(), MathContext.DECIMAL32));
+        valueNett = Value.of(valueGross.asDecimal()
+                .divide(itemModel.getVat().asDecimal().add(ONE), 2, RoundingMode.HALF_UP));
     }
 }

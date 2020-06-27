@@ -9,6 +9,7 @@ public interface ProducerConverter {
     static ProducerModel convertToModel(Producer producer) {
         return ProducerModel.builder()
                 .id(producer.getId())
+                .lang(producer.getLang())
                 .name(producer.getName())
                 .description(producer.getDescription())
                 .image(ImageConverter.convertToModel(producer.getImage()))
@@ -18,6 +19,7 @@ public interface ProducerConverter {
     static ProducerDto convertToDto(ProducerModel producer) {
         return ProducerDto.builder()
                 .id(producer.getId())
+                .lang(producer.getLang())
                 .name(producer.getName())
                 .description(producer.getDescription())
                 .image(ImageConverter.convertToDto(producer.getImage()))

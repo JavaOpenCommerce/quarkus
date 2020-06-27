@@ -9,8 +9,8 @@
       db-kind: postgresql
       jdbc:
         url: jdbc:postgresql://localhost:5432/main_postgres_db
-      username: testuser
-      password: testpass
+      username: ${QUARKUS_DATASOURCE_USERNAME}
+      password: ${QUARKUS_DATASOURCE_PASSWORD}
 
     #hibernate settings
     hibernate-orm:

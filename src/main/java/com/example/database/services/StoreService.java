@@ -1,7 +1,6 @@
 package com.example.database.services;
 
 import com.example.business.models.CategoryModel;
-import com.example.business.models.ItemDetailModel;
 import com.example.business.models.ItemModel;
 import com.example.business.models.PageModel;
 import com.example.business.models.ProducerModel;
@@ -13,7 +12,6 @@ import com.example.database.repositories.ProducerRepository;
 import com.example.utils.LanguageResolver;
 import com.example.utils.converters.CategoryConverter;
 import com.example.utils.converters.ItemConverter;
-import com.example.utils.converters.ItemDetailConverter;
 import com.example.utils.converters.ProducerConverter;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
@@ -55,13 +53,12 @@ public class StoreService {
                 .collect(Collectors.toList());
     }
 
-    public ItemDetailModel getItemDetailModel(Long id) {
-
+    public ItemModel getItemById(Long id) {
         Item item = itemRepository.findByIdOptional(id)
                 .orElseThrow(() ->
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
-        return ItemDetailConverter
-                .convertToModel(item, languageResolver.getLanguage(), languageResolver.getDefault());
+        return ItemConverter
+                .convertToModel(item);
     }
 
     public PageModel<ItemModel> getPageOfAllItems(int pageIndex, int pageSize) {
@@ -86,7 +83,7 @@ public class StoreService {
     private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, PanacheQuery<Item> itemPanacheQuery) {
         List<ItemModel> itemModels = itemPanacheQuery.list().stream()
                 .filter(i -> validUserProductCategory(i.getCategory()))
-                .map(i -> ItemConverter.convertToModel(i, languageResolver.getLanguage(), languageResolver.getDefault()))
+                .map(i -> ItemConverter.convertToModel(i))
                 .collect(Collectors.toList());
 
         return PageModel.<ItemModel>builder()

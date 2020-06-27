@@ -1,7 +1,6 @@
 package com.example.quarkus.app;
 
 
-import com.example.database.services.StoreService;
 import io.quarkus.vertx.web.Route;
 import io.quarkus.vertx.web.RoutingExchange;
 import io.vertx.core.http.HttpMethod;
@@ -12,10 +11,6 @@ import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class Routing {
-
-    private final StoreService storeService;
-
-    public Routing(StoreService storeService) {this.storeService = storeService;}
 
     @Route(path = "/hello", methods = HttpMethod.GET)
     void hello(RoutingContext rc) {

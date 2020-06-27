@@ -6,7 +6,6 @@ import com.example.database.entity.Address;
 import com.example.database.entity.Item;
 import com.example.database.repositories.AddressRepository;
 import com.example.database.repositories.ItemRepository;
-import com.example.utils.LanguageResolver;
 import com.example.utils.converters.AddressConverter;
 import com.example.utils.converters.ItemConverter;
 
@@ -21,13 +20,11 @@ public class CardService {
 
     private final ItemRepository itemRepository;
     private final AddressRepository addressRepository;
-    private final LanguageResolver languageResolver;
 
     public CardService(ItemRepository itemRepository,
-            AddressRepository addressRepository, LanguageResolver languageResolver) {
+            AddressRepository addressRepository) {
         this.itemRepository = itemRepository;
         this.addressRepository = addressRepository;
-        this.languageResolver = languageResolver;
     }
 
     public ItemModel getItemModel(Long id) {
@@ -36,7 +33,7 @@ public class CardService {
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
 
         return ItemConverter
-                .convertToModel(item, languageResolver.getLanguage(), languageResolver.getDefault());
+                .convertToModel(item);
     }
 
     public int checkItemStock(Long id) {
@@ -62,7 +59,7 @@ public class CardService {
 
     public List<ItemModel> getShippingMethods() {
         return itemRepository.getShippingMethodList().stream()
-                .map(i -> ItemConverter.convertToModel(i, languageResolver.getLanguage(), languageResolver.getDefault()))
+                .map(i -> ItemConverter.convertToModel(i))
                 .collect(Collectors.toList());
 
     }

@@ -4,16 +4,18 @@ import com.example.business.models.ItemModel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.math.MathContext;
+import java.math.RoundingMode;
+
 import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
 
 @Getter
 @EqualsAndHashCode
 public final class Product {
 
     private final ItemModel itemModel;
-    private Value valueNett = Value.of(ZERO);
-    private Value valueGross = Value.of(ZERO);
+    private Value valueNett;
+    private Value valueGross;
     private Amount amount;
 
 
@@ -41,7 +43,10 @@ public final class Product {
     }
 
     private void calculateSumValue() {
-        valueGross = itemModel.getValueGross().multiply(amount.asDecimal());
-        valueNett = valueGross.divide(itemModel.getVat().asDecimal().add(ONE));
+        valueGross = Value.of(itemModel.getValueGross()
+                .asDecimal()
+                .multiply(amount.asDecimal(), MathContext.DECIMAL32));
+        valueNett = Value.of(valueGross.asDecimal()
+                .divide(itemModel.getVat().asDecimal().add(ONE), 2, RoundingMode.HALF_UP));
     }
 }

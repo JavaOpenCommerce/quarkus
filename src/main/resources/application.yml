@@ -1,7 +1,7 @@
 # Configuration file
 # key = value
 
-"%dev":
+
   quarkus:
 
     #datasource settings
@@ -33,7 +33,7 @@
           schema-management:
             required-status: yellow
         analysis:
-          configurer: com.example.database.AnalysisConfigurer
+          configurer: com.example.elasticsearch.AnalysisConfigurer
 
     #locale
     default-locale: pl-PL
@@ -41,7 +41,8 @@
   com:
     example:
       default-locale: pl
-
+      elasticsearch-host: localhost
+      elasticsearch-port: 9200
 
 
 

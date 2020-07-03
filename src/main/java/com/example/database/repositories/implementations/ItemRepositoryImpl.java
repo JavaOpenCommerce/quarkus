@@ -49,8 +49,8 @@ public class ItemRepositoryImpl implements ItemRepository {
                                         "INNER JOIN Image img ON i.image_id = img.id " +
                                         "INNER JOIN Producer p ON i.producer_id = p.id " +
                                         "WHERE i.id = $1", Tuple.of(id))
-                .map(RowSet::iterator)
-                .map(it -> it.hasNext() ? rowToItem(it.next()) :null);
+                .onItem().apply(RowSet::iterator)
+                .onItem().apply(it -> it.hasNext() ? rowToItem(it.next()) :null);
     }
 
     public Uni<Set<ItemDetails>> getItemDetailsListByItemId(Long id) {
@@ -86,8 +86,4 @@ public class ItemRepositoryImpl implements ItemRepository {
                 .name(row.getString("name"))
                 .build();
     }
-
-
-
-
 }

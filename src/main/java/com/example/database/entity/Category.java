@@ -13,7 +13,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "items")
+@EqualsAndHashCode
 public class Category {
 
     private Long id;

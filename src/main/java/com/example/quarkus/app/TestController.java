@@ -1,6 +1,5 @@
 package com.example.quarkus.app;
 
-import com.example.database.entity.Item;
 import com.example.database.services.ItemAssemblingService;
 import com.example.rest.dtos.CategoryDto;
 import com.example.rest.dtos.ItemDetailDto;
@@ -43,8 +42,8 @@ public class TestController {
 
 
     @GET
-    @Path("/items/{id}")
-    public ItemDetailDto getItemById(@PathParam("id") Long id) {
+    @Path("reactive/items/{id}")
+    public Uni<ItemDetailDto> getItemById(@PathParam("id") Long id) {
         return storeService.getItemById(id);
     }
 
@@ -95,12 +94,4 @@ public class TestController {
         return extractor.getLanguage();
     }
 
-
-    //==========================================================================================  POC
-
-    @GET
-    @Path("/reactive/item/{id}")
-    public Uni<Item> getItemByIdTest(@PathParam("id") Long id) {
-        return itemAssemblingService.assembleSingleItem(id);
-    }
 }

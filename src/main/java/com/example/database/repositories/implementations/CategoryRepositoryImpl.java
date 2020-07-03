@@ -27,12 +27,12 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                                         "INNER JOIN item_category ic ON ic.category_id = c.id " +
                                         "INNER JOIN CategoryDetails cd ON cd.category_id = c.id " +
                                         "WHERE ic.item_id = $1", Tuple.of(id))
-                .map(rs -> rowToCategory(rs));
+                .onItem().apply(rs -> rs.iterator().hasNext() ? rowToCategory(rs) : null);
     }
 
     private Set<Category> rowToCategory(RowSet<Row> rows) {
         Set<Category> result = new HashSet<>(rows.size());
-        System.out.println(rows.columnsNames());
+
         for (Row row : rows) {
             if (isCategoryAlreadyMapped(result, row)) {
                 Category category = result.stream()

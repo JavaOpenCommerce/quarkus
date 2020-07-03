@@ -12,7 +12,7 @@ import java.util.Locale;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "producer")
+@EqualsAndHashCode
 public class ProducerDetails {
 
     private Long id;

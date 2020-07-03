@@ -7,21 +7,17 @@ import com.example.business.models.ProducerModel;
 import com.example.database.entity.Category;
 import com.example.database.entity.Item;
 import com.example.database.entity.Producer;
-import com.example.database.repositories.interfaces.CategoryRepository;
 import com.example.database.repositories.interfaces.ItemRepository;
-import com.example.database.repositories.interfaces.ProducerRepository;
 import com.example.elasticsearch.SearchService;
 import com.example.utils.converters.CategoryConverter;
 import com.example.utils.converters.ItemConverter;
 import com.example.utils.converters.ProducerConverter;
+import io.smallrye.mutiny.Uni;
 import lombok.extern.jbosslog.JBossLog;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,21 +25,23 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 public class StoreService {
 
-    private final CategoryRepository categoryRepository;
     private final ItemRepository itemRepository;
-    private final ProducerRepository producerRepository;
+    private final ItemAssemblingService itemAssemblingService;
     private final SearchService searchService;
 
 
 
-    public StoreService(CategoryRepository categoryRepository,
-            ItemRepository itemRepository,
-            ProducerRepository producerRepository,
-            SearchService searchService) {
-        this.categoryRepository = categoryRepository;
+    public StoreService(ItemRepository itemRepository,
+            ItemAssemblingService itemAssemblingService, SearchService searchService) {
         this.itemRepository = itemRepository;
-        this.producerRepository = producerRepository;
+        this.itemAssemblingService = itemAssemblingService;
         this.searchService = searchService;
+    }
+
+    public Uni<ItemModel> getItemById(Long id) {
+        Uni<Item> itemUni = itemAssemblingService.assembleSingleItem(id);
+
+        return itemUni.onItem().apply(item -> ItemConverter.convertToModel(item));
     }
 
     public List<CategoryModel> getCategoryList() {
@@ -58,14 +56,6 @@ public class StoreService {
         return new ArrayList<Producer>().stream() //TODO
                 .map(p -> ProducerConverter.convertToModel(p))
                 .collect(Collectors.toList());
-    }
-
-    public ItemModel getItemById(Long id) {
-        Item item = Optional.ofNullable(new Item()) //TODO
-                .orElseThrow(() ->
-                        new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
-        return ItemConverter
-                .convertToModel(item);
     }
 
     public PageModel<ItemModel> getPageOfAllItems(int pageIndex, int pageSize) {

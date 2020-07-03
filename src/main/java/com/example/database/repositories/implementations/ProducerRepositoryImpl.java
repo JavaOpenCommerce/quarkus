@@ -29,11 +29,10 @@ public class ProducerRepositoryImpl implements ProducerRepository {
                                         "INNER JOIN ProducerDetails pd ON pd.producer_id = p.id " +
                                         "INNER JOIN Item i ON i.producer_id = p.id " +
                                         "WHERE i.id = $1", Tuple.of(id))
-                .map(rs -> rowToProducer(rs));
+                .onItem().apply(rs -> rs.iterator().hasNext() ? rowToProducer(rs) : null);
     }
 
     private Producer rowToProducer(RowSet<Row> rs) {
-
         Set<ProducerDetails> details = new HashSet<>();
 
         for (Row row : rs) {

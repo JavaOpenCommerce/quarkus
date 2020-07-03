@@ -29,12 +29,16 @@ public class ItemAssemblingService {
     }
 
     public Uni<Item> assembleSingleItem(Long id) {
+
+        //locals for exception handling testing
+        Uni<Item> itemUni = itemRepository.getItemById(id);
+        Uni<Set<ItemDetails>> itemDetailsUni = itemRepository.getItemDetailsListByItemId(id);
+        Uni<Set<Category>> categoriesUni = categoryRepository.getCategoriesByItemId(id);
+        Uni<Producer> producerUni = producerRepository.getProducerByItemId(id);
+
         return Uni.combine().all()
-                .unis(itemRepository.getItemById(id),
-                        itemRepository.getItemDetailsListByItemId(id),
-                        categoryRepository.getCategoriesByItemId(id),
-                        producerRepository.getProducerByItemId(id))
-                .combinedWith((Item item, Set<ItemDetails> itemDetails, Set<Category> categories, Producer producer) -> {
+                .unis(itemUni, itemDetailsUni, categoriesUni, producerUni)
+                .combinedWith((item, itemDetails, categories, producer) -> {
                     item.setDetails(itemDetails);
                     item.setCategory(categories);
                     item.setProducer(producer);

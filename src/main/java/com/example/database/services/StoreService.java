@@ -6,16 +6,14 @@ import com.example.business.models.PageModel;
 import com.example.business.models.ProducerModel;
 import com.example.database.entity.Category;
 import com.example.database.entity.Item;
-import com.example.database.repositories.CategoryRepository;
-import com.example.database.repositories.ItemRepository;
-import com.example.database.repositories.ProducerRepository;
+import com.example.database.entity.Producer;
+import com.example.database.repositories.interfaces.CategoryRepository;
+import com.example.database.repositories.interfaces.ItemRepository;
+import com.example.database.repositories.interfaces.ProducerRepository;
 import com.example.elasticsearch.SearchService;
 import com.example.utils.converters.CategoryConverter;
 import com.example.utils.converters.ItemConverter;
 import com.example.utils.converters.ProducerConverter;
-import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import lombok.extern.jbosslog.JBossLog;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -23,6 +21,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public class StoreService {
     }
 
     public List<CategoryModel> getCategoryList() {
-        return categoryRepository.findAll().stream()
+        return new ArrayList<Category>().stream() //TODO
                 .filter(c -> c.getDetails().stream()
                         .allMatch(detail -> !"shipping".equalsIgnoreCase(detail.getName())))
                 .map(c -> CategoryConverter.convertToModel(c))
@@ -56,13 +55,13 @@ public class StoreService {
     }
 
     public List<ProducerModel> getProducerList() {
-        return producerRepository.findAll().stream()
+        return new ArrayList<Producer>().stream() //TODO
                 .map(p -> ProducerConverter.convertToModel(p))
                 .collect(Collectors.toList());
     }
 
     public ItemModel getItemById(Long id) {
-        Item item = itemRepository.findByIdOptional(id)
+        Item item = Optional.ofNullable(new Item()) //TODO
                 .orElseThrow(() ->
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
         return ItemConverter
@@ -70,35 +69,35 @@ public class StoreService {
     }
 
     public PageModel<ItemModel> getPageOfAllItems(int pageIndex, int pageSize) {
-        PanacheQuery<Item> page = itemRepository.getAll(pageIndex, pageSize);
+        List<Item> page = itemRepository.getAll(pageIndex, pageSize);
         return getItemModelPage(pageIndex, pageSize, page);
     }
 
     public PageModel<ItemModel> getItemsPageByCategory(Long categoryId, int pageIndex, int pageSize) {
-        PanacheQuery<Item> itemPanacheQuery = itemRepository
+        List<Item> itemPanacheQuery = itemRepository
                 .listItemByCategoryId(categoryId, pageIndex, pageSize);
 
         return getItemModelPage(pageIndex, pageSize, itemPanacheQuery);
     }
 
     public PageModel<ItemModel> getItemsPageByProducer(Long producerId, int pageIndex, int pageSize) {
-        PanacheQuery<Item> itemPanacheQuery = itemRepository
+        List<Item> itemPanacheQuery = itemRepository
                 .listItemByProducerId(producerId, pageIndex, pageSize);
 
         return getItemModelPage(pageIndex, pageSize, itemPanacheQuery);
     }
 
-    private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, PanacheQuery<Item> itemPanacheQuery) {
-        List<ItemModel> itemModels = itemPanacheQuery.list().stream()
+    private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, List<Item> itemPanacheQuery) {
+        List<ItemModel> itemModels = itemPanacheQuery.stream() //TODO
                 .filter(i -> validUserCategory(i.getCategory()))
                 .map(i -> ItemConverter.convertToModel(i))
                 .collect(Collectors.toList());
 
         return PageModel.<ItemModel>builder()
-                .pageCount(itemPanacheQuery.pageCount())
+                .pageCount(0) //TODO
                 .pageNumber(pageIndex)
                 .pageSize(pageSize)
-                .totalElementsCount((int) itemPanacheQuery.count())
+                .totalElementsCount(0) //TODO
                 .items(itemModels)
                 .build();
     }
@@ -108,21 +107,4 @@ public class StoreService {
                 .flatMap(category -> category.getDetails().stream())
                 .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));
     }
-
-    //========================================================================================= PoC
-
-    public void getFilteredResultsFromDB(JsonObject json) {
-        JsonArray hits = json
-                .getJsonObject("hits")
-                .getJsonArray("hits");
-
-        List<Integer> ids = new ArrayList<>();
-        for (int i = 0; i < hits.size(); i++) {
-            ids.add(Integer.parseInt(hits.getJsonObject(i).getString("_id")));
-        }
-        ids.forEach(id -> log.info("Id from elastic: " + id));
-    }
-
-
-
 }

@@ -61,7 +61,7 @@ public class SearchService {
                                 .put("code", resp.statusCode())
                                 .put("message", resp.bodyAsString());
                     }
-                }).subscribe().with(result -> service.getFilteredResultsFromDB(result),
+                }).subscribe().with(result -> System.out.println(result),
                         failure -> log.info(failure.getMessage()));
     }
 }

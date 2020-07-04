@@ -44,24 +44,33 @@ public class ItemRepositoryImpl implements ItemRepository {
         return null;
     }
 
+
+    @Override
+    public Uni<Set<Item>> getAll() {
+        return client.preparedQuery("SELECT * FROM Item i " +
+                                        "INNER JOIN Image img ON i.image_id = img.id ")
+                .onItem().apply(rs -> {
+                    Set<Item> items = new HashSet<>();
+                    for (Row row : rs) {
+                        items.add(rowToItem(row));
+                    }
+                    return items;
+                });
+    }
+
+    @Override
     public Uni<Item> getItemById(Long id) {
         return client.preparedQuery("SELECT * FROM Item i " +
                                         "INNER JOIN Image img ON i.image_id = img.id " +
-                                        "INNER JOIN Producer p ON i.producer_id = p.id " +
                                         "WHERE i.id = $1", Tuple.of(id))
                 .onItem().apply(RowSet::iterator)
-                .onItem().apply(it -> it.hasNext() ? rowToItem(it.next()) :null);
+                .onItem().apply(it -> it.hasNext() ? rowToItem(it.next()) : null);
     }
 
+    @Override
     public Uni<Set<ItemDetails>> getItemDetailsListByItemId(Long id) {
         return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = $1", Tuple.of(id))
-                .map(rs -> {
-                    Set<ItemDetails> result = new HashSet<>(rs.size());
-                    for (Row row : rs) {
-                        result.add(this.rowToItemDetails(row));
-                    }
-                    return result;
-                });
+                .map(rs -> rs.iterator().hasNext() ? rowToItemDetails(rs) : null);
     }
 
     private Item rowToItem(Row row) {
@@ -78,12 +87,16 @@ public class ItemRepositoryImpl implements ItemRepository {
                 .build();
     }
 
-    private ItemDetails rowToItemDetails(Row row) {
-        return ItemDetails.builder()
-                .id(row.getLong("id"))
-                .description(row.getString("description"))
-                .lang(Locale.forLanguageTag(row.getString("lang")))
-                .name(row.getString("name"))
-                .build();
+    private Set<ItemDetails> rowToItemDetails(RowSet<Row> rs) {
+        Set<ItemDetails> result = new HashSet<>(rs.size());
+        for (Row row : rs) {
+            result.add(ItemDetails.builder()
+                    .id(row.getLong("id"))
+                    .description(row.getString("description"))
+                    .lang(Locale.forLanguageTag(row.getString("lang")))
+                    .name(row.getString("name"))
+                    .build());
+        }
+        return result;
     }
 }

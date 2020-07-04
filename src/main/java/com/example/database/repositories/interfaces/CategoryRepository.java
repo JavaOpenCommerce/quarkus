@@ -7,6 +7,8 @@ import java.util.Set;
 
 public interface CategoryRepository {
 
+    Uni<Set<Category>> getAll();
+
     Uni<Set<Category>> getCategoriesByItemId(Long id);
 
 }

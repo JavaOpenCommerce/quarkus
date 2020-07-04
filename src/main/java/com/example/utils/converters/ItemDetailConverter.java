@@ -7,17 +7,22 @@ import com.example.database.entity.ItemDetails;
 import com.example.rest.dtos.ImageDto;
 import com.example.rest.dtos.ItemDetailDto;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 
 public interface ItemDetailConverter {
 
     static ItemDetailModel convertToModel(ItemDetails details) {
 
-        Set<ImageModel> images = details.getImages().stream()
+        Set<ImageModel> images = ofNullable(details.getImages()).orElse(emptySet())
+                .stream()
                 .map(i -> ImageConverter.convertToModel(i))
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
         return ItemDetailModel.builder()
                 .name(details.getName())
@@ -31,9 +36,10 @@ public interface ItemDetailConverter {
 
         ItemDetailModel details = getItemDetailsByLanguage(item, lang, defaultLang);
 
-        Set<ImageDto> images = details.getAdditionalImages().stream()
+        Set<ImageDto> images = details.getAdditionalImages() != null ?
+                details.getAdditionalImages().stream()
                 .map(i -> ImageConverter.convertToDto(i))
-                .collect(Collectors.toSet());
+                .collect(toSet()) : new HashSet<>();
 
         return ItemDetailDto.builder()
                 .id(item.getId())

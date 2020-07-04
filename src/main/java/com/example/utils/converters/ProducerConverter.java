@@ -2,24 +2,30 @@ package com.example.utils.converters;
 
 import com.example.business.models.ProducerDetailModel;
 import com.example.business.models.ProducerModel;
+import com.example.database.entity.Image;
 import com.example.database.entity.Producer;
 import com.example.rest.dtos.ProducerDto;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
+
 public interface ProducerConverter {
 
     static ProducerModel convertToModel(Producer producer) {
 
-        Set<ProducerDetailModel> details = producer.getDetails().stream()
+        Set<ProducerDetailModel> details = ofNullable(producer.getDetails()).orElse(emptySet())
+                .stream()
                 .map(d -> ProducerDetailConverter.convertToModel(d))
                 .collect(Collectors.toSet());
 
         return ProducerModel.builder()
                 .id(producer.getId())
                 .details(details)
-                .image(ImageConverter.convertToModel(producer.getImage()))
+                .image(ImageConverter.convertToModel(
+                        ofNullable(producer.getImage()).orElse(Image.builder().build())))
                 .build();
     }
 

@@ -9,6 +9,8 @@ import java.util.Set;
 
 public interface ItemRepository {
 
+    Uni<Set<Item>> getAll();
+
     Uni<Item> getItemById(Long id);
 
     Uni<Set<ItemDetails>> getItemDetailsListByItemId(Long id);

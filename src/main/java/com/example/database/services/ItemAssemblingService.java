@@ -21,8 +21,7 @@ public class ItemAssemblingService {
 
 
     public ItemAssemblingService(ItemRepository itemRepository,
-            CategoryRepository categoryRepository,
-            ProducerRepository producerRepository) {
+            CategoryRepository categoryRepository, ProducerRepository producerRepository) {
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.producerRepository = producerRepository;
@@ -30,8 +29,10 @@ public class ItemAssemblingService {
 
     public Uni<Item> assembleSingleItem(Long id) {
 
-        //locals for exception handling testing
-        Uni<Item> itemUni = itemRepository.getItemById(id);
+        Uni<Item> itemUni = itemRepository.getItemById(id)
+                .onItem()
+                .ifNull().continueWith(Item.builder().build());
+
         Uni<Set<ItemDetails>> itemDetailsUni = itemRepository.getItemDetailsListByItemId(id);
         Uni<Set<Category>> categoriesUni = categoryRepository.getCategoriesByItemId(id);
         Uni<Producer> producerUni = producerRepository.getProducerByItemId(id);
@@ -44,5 +45,12 @@ public class ItemAssemblingService {
                     item.setProducer(producer);
                     return item;
                 });
+    }
+
+    public Uni<Set<Item>> assemblyFullItemList() {
+        Uni<Set<Item>> items = itemRepository.getAll();
+        Uni<Set<Category>> categories = categoryRepository.getAll();
+        //cdn...
+        return items;
     }
 }

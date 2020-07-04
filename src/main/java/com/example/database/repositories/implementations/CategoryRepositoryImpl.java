@@ -21,6 +21,15 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     public CategoryRepositoryImpl(PgPool client) {this.client = client;}
 
+
+    @Override
+    public Uni<Set<Category>> getAll() {
+        return client.preparedQuery("SELECT * FROM Category c " +
+                                        "INNER JOIN item_category ic ON ic.category_id = c.id " +
+                                        "INNER JOIN CategoryDetails cd ON cd.category_id = c.id ")
+                .onItem().apply(rs -> rs.iterator().hasNext() ? rowToCategory(rs) : null);
+    }
+
     @Override
     public Uni<Set<Category>> getCategoriesByItemId(Long id) {
         return client.preparedQuery("SELECT * FROM Category c " +

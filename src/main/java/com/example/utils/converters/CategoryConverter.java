@@ -8,11 +8,15 @@ import com.example.rest.dtos.CategoryDto;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
+
 public interface CategoryConverter {
 
     static CategoryModel convertToModel(Category category) {
 
-        Set<CategoryDetailModel> details = category.getDetails().stream()
+        Set<CategoryDetailModel> details = ofNullable(category.getDetails()).orElse(emptySet())
+                .stream()
                 .map(d -> CategoryDetailConverter.convertToModel(d))
                 .collect(Collectors.toSet());
 

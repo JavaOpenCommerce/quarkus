@@ -1,5 +1,6 @@
 package com.example.quarkus.app;
 
+import com.example.database.entity.Item;
 import com.example.database.services.ItemAssemblingService;
 import com.example.rest.dtos.CategoryDto;
 import com.example.rest.dtos.ItemDetailDto;
@@ -92,6 +93,14 @@ public class TestController {
     @Path("/locale")
     public String getLocale() {
         return extractor.getLanguage();
+    }
+
+    //=============================================================== TEST
+
+    @GET
+    @Path("reactive/items")
+    public Uni<List<Item>> getAll() {
+        return itemAssemblingService.assemblyFullItemList();
     }
 
 }

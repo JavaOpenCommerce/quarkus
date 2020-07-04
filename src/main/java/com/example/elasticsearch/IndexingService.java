@@ -24,6 +24,7 @@ import static com.example.utils.converters.SearchItemConverter.convertToSearchIt
 @ApplicationScoped
 public class IndexingService {
 
+    //Should switch to mutiny instead of reactivex !!
     private WebClient client;
     private final ItemRepository repository;
 

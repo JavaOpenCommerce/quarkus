@@ -10,7 +10,6 @@ import com.example.database.entity.Producer;
 import com.example.database.repositories.interfaces.ItemRepository;
 import com.example.elasticsearch.SearchService;
 import com.example.utils.converters.CategoryConverter;
-import com.example.utils.converters.ItemConverter;
 import com.example.utils.converters.ProducerConverter;
 import io.smallrye.mutiny.Uni;
 import lombok.extern.jbosslog.JBossLog;
@@ -38,9 +37,8 @@ public class StoreService {
     }
 
     public Uni<ItemModel> getItemById(Long id) {
-        Uni<Item> itemUni = itemAssemblingService.assembleSingleItem(id);
-
-        return itemUni.onItem().apply(item -> ItemConverter.convertToModel(item));
+        //TOdo
+        return itemAssemblingService.getSingleItem(id);
     }
 
     public List<CategoryModel> getCategoryList() {
@@ -58,7 +56,7 @@ public class StoreService {
     }
 
     public PageModel<ItemModel> getPageOfAllItems(int pageIndex, int pageSize) {
-        List<Item> page = itemRepository.getAll(pageIndex, pageSize);
+        List<Item> page = new ArrayList<>(); //TODO
         return getItemModelPage(pageIndex, pageSize, page);
     }
 
@@ -77,18 +75,20 @@ public class StoreService {
     }
 
     private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, List<Item> itemPanacheQuery) {
-        List<ItemModel> itemModels = itemPanacheQuery.stream() //TODO
-                .filter(i -> validUserCategory(i.getCategory()))
-                .map(i -> ItemConverter.convertToModel(i))
-                .collect(Collectors.toList());
 
-        return PageModel.<ItemModel>builder()
-                .pageCount(0) //TODO
-                .pageNumber(pageIndex)
-                .pageSize(pageSize)
-                .totalElementsCount(0) //TODO
-                .items(itemModels)
-                .build();
+        return null; //todo
+//        List<ItemModel> itemModels = itemPanacheQuery.stream() //TODO
+//                //.filter(i -> validUserCategory(i.getCategory())) //TODO
+//                .map(i -> ItemConverter.convertToModel(i))
+//                .collect(Collectors.toList());
+//
+//        return PageModel.<ItemModel>builder()
+//                .pageCount(0) //TODO
+//                .pageNumber(pageIndex)
+//                .pageSize(pageSize)
+//                .totalElementsCount(0) //TODO
+//                .items(itemModels)
+//                .build();
     }
 
     private boolean validUserCategory(List<Category> categories) {

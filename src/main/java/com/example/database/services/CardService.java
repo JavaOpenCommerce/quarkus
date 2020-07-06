@@ -7,14 +7,12 @@ import com.example.database.entity.Item;
 import com.example.database.repositories.interfaces.AddressRepository;
 import com.example.database.repositories.interfaces.ItemRepository;
 import com.example.utils.converters.AddressConverter;
-import com.example.utils.converters.ItemConverter;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class CardService {
@@ -32,9 +30,10 @@ public class CardService {
         Item item = Optional.ofNullable(new Item()) //TODO
                 .orElseThrow(() ->
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
+        return null; //todo
 
-        return ItemConverter
-                .convertToModel(item);
+//        return ItemConverter
+//                .convertToModel(item);
     }
 
     public int checkItemStock(Long id) {
@@ -59,9 +58,10 @@ public class CardService {
     }
 
     public List<ItemModel> getShippingMethods() {
-        return itemRepository.getShippingMethodList().stream()
-                .map(i -> ItemConverter.convertToModel(i))
-                .collect(Collectors.toList());
+        return null;
+//        return itemRepository.getShippingMethodList().stream()
+//                .map(i -> ItemConverter.convertToModel(i))
+//                .collect(Collectors.toList());
 
     }
 }

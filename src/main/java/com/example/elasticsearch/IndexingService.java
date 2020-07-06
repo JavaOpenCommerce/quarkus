@@ -14,7 +14,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.example.utils.converters.ItemConverter.convertToModel;
@@ -63,7 +62,7 @@ public class IndexingService {
                 .collect(Collectors.toList());
     }
 
-    private boolean validUserCategory(Set<Category> categories) {
+    private boolean validUserCategory(List<Category> categories) {
         return categories.stream()
                 .flatMap(category -> category.getDetails().stream())
                 .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));

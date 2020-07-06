@@ -3,12 +3,12 @@ package com.example.database.repositories.interfaces;
 import com.example.database.entity.Category;
 import io.smallrye.mutiny.Uni;
 
-import java.util.Set;
+import java.util.List;
 
 public interface CategoryRepository {
 
-    Uni<Set<Category>> getAll();
+    Uni<List<Category>> getAll();
 
-    Uni<Set<Category>> getCategoriesByItemId(Long id);
+    Uni<List<Category>> getCategoriesByItemId(Long id);
 
 }

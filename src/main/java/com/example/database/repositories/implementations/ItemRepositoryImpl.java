@@ -7,15 +7,15 @@ import com.example.database.repositories.interfaces.ItemRepository;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
-import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
+
+import static java.util.Collections.emptyList;
 
 @ApplicationScoped
 public class ItemRepositoryImpl implements ItemRepository {
@@ -46,11 +46,13 @@ public class ItemRepositoryImpl implements ItemRepository {
 
 
     @Override
-    public Uni<Set<Item>> getAll() {
+    public Uni<List<Item>> getAll() {
         return client.preparedQuery("SELECT * FROM Item i " +
                                         "INNER JOIN Image img ON i.image_id = img.id ")
                 .onItem().apply(rs -> {
-                    Set<Item> items = new HashSet<>();
+                    if (rs == null) return emptyList();
+
+                    List<Item> items = new ArrayList<>();
                     for (Row row : rs) {
                         items.add(rowToItem(row));
                     }
@@ -63,17 +65,46 @@ public class ItemRepositoryImpl implements ItemRepository {
         return client.preparedQuery("SELECT * FROM Item i " +
                                         "INNER JOIN Image img ON i.image_id = img.id " +
                                         "WHERE i.id = $1", Tuple.of(id))
-                .onItem().apply(RowSet::iterator)
-                .onItem().apply(it -> it.hasNext() ? rowToItem(it.next()) : null);
+                .onItem().apply(rs -> {
+                    if (rs == null || !rs.iterator().hasNext()) {
+                        return Item.builder().build();
+                    }
+                    return rowToItem(rs.iterator().next());
+                });
     }
 
     @Override
-    public Uni<Set<ItemDetails>> getItemDetailsListByItemId(Long id) {
+    public Uni<List<ItemDetails>> getItemDetailsListByItemId(Long id) {
         return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = $1", Tuple.of(id))
-                .map(rs -> rs.iterator().hasNext() ? rowToItemDetails(rs) : null);
+                .onItem().apply(rs -> {
+                    if (rs == null) return emptyList();
+
+                    List<ItemDetails> result = new ArrayList<>(rs.size());
+                    for (Row row : rs) {
+                        result.add(rowToItemDetails(row));
+                    }
+                    return result;
+                });
+    }
+
+    private ItemDetails rowToItemDetails(Row row) {
+        if (row == null) {
+            return ItemDetails.builder().build();
+        }
+
+        return ItemDetails.builder()
+                .id(row.getLong("id"))
+                .description(row.getString("description"))
+                .lang(Locale.forLanguageTag(row.getString("lang")))
+                .name(row.getString("name"))
+                .build();
     }
 
     private Item rowToItem(Row row) {
+        if (row == null) {
+            return Item.builder().build();
+        }
+
         return Item.builder()
                 .stock(row.getInteger("stock"))
                 .valueGross(BigDecimal.valueOf(row.getDouble("valuegross")))
@@ -85,18 +116,5 @@ public class ItemRepositoryImpl implements ItemRepository {
                         .url(row.getString("url"))
                         .build())
                 .build();
-    }
-
-    private Set<ItemDetails> rowToItemDetails(RowSet<Row> rs) {
-        Set<ItemDetails> result = new HashSet<>(rs.size());
-        for (Row row : rs) {
-            result.add(ItemDetails.builder()
-                    .id(row.getLong("id"))
-                    .description(row.getString("description"))
-                    .lang(Locale.forLanguageTag(row.getString("lang")))
-                    .name(row.getString("name"))
-                    .build());
-        }
-        return result;
     }
 }

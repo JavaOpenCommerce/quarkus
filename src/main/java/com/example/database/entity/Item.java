@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -28,9 +28,9 @@ public class Item {
     private Producer producer;
 
     @Builder.Default
-    private Set<Category> category = new HashSet<>();
+    private List<Category> category = new ArrayList<>();
 
     @Builder.Default
-    private Set<ItemDetails> details = new HashSet<>();
+    private List<ItemDetails> details = new ArrayList<>();
 
 }

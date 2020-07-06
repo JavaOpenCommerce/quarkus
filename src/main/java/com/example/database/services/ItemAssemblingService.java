@@ -10,7 +10,7 @@ import com.example.database.repositories.interfaces.ProducerRepository;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.Set;
+import java.util.List;
 
 @ApplicationScoped
 public class ItemAssemblingService {
@@ -29,12 +29,9 @@ public class ItemAssemblingService {
 
     public Uni<Item> assembleSingleItem(Long id) {
 
-        Uni<Item> itemUni = itemRepository.getItemById(id)
-                .onItem()
-                .ifNull().continueWith(Item.builder().build());
-
-        Uni<Set<ItemDetails>> itemDetailsUni = itemRepository.getItemDetailsListByItemId(id);
-        Uni<Set<Category>> categoriesUni = categoryRepository.getCategoriesByItemId(id);
+        Uni<Item> itemUni = itemRepository.getItemById(id);
+        Uni<List<ItemDetails>> itemDetailsUni = itemRepository.getItemDetailsListByItemId(id);
+        Uni<List<Category>> categoriesUni = categoryRepository.getCategoriesByItemId(id);
         Uni<Producer> producerUni = producerRepository.getProducerByItemId(id);
 
         return Uni.combine().all()
@@ -47,9 +44,9 @@ public class ItemAssemblingService {
                 });
     }
 
-    public Uni<Set<Item>> assemblyFullItemList() {
-        Uni<Set<Item>> items = itemRepository.getAll();
-        Uni<Set<Category>> categories = categoryRepository.getAll();
+    public Uni<List<Item>> assemblyFullItemList() {
+        Uni<List<Item>> items = itemRepository.getAll();
+        Uni<List<Category>> categories = categoryRepository.getAll();
         //cdn...
         return items;
     }

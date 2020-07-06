@@ -6,8 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -19,5 +19,5 @@ public class Category {
     private Long id;
 
     @Builder.Default
-    private Set<CategoryDetails> details = new HashSet<>();
+    private List<CategoryDetails> details = new ArrayList<>();
 }

@@ -5,15 +5,14 @@ import com.example.database.entity.ItemDetails;
 import io.smallrye.mutiny.Uni;
 
 import java.util.List;
-import java.util.Set;
 
 public interface ItemRepository {
 
-    Uni<Set<Item>> getAll();
+    Uni<List<Item>> getAll();
 
     Uni<Item> getItemById(Long id);
 
-    Uni<Set<ItemDetails>> getItemDetailsListByItemId(Long id);
+    Uni<List<ItemDetails>> getItemDetailsListByItemId(Long id);
 
     List<Item> listItemByCategoryId(Long categoryId, int pageIndex, int pageSize);
 

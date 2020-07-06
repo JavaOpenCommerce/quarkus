@@ -7,9 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 @Getter
 @Builder
@@ -24,6 +24,6 @@ public class ItemDetails {
     private String description;
 
     @Builder.Default
-    private Set<Image> images = new HashSet<>();
+    private List<Image> images = new ArrayList<>();
 
 }

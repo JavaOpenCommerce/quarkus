@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Builder
@@ -16,6 +16,6 @@ import java.util.Set;
 public class Producer {
 
     private Long id;
-    private Set<ProducerDetails> details;
+    private List<ProducerDetails> details;
     private Image image;
 }

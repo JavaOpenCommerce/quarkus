@@ -11,9 +11,9 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 @ApplicationScoped
 public class ProducerRepositoryImpl implements ProducerRepository {
@@ -22,6 +22,7 @@ public class ProducerRepositoryImpl implements ProducerRepository {
 
     public ProducerRepositoryImpl(PgPool client) {this.client = client;}
 
+
     @Override
     public Uni<Producer> getProducerByItemId(Long id) {
         return client.preparedQuery("SELECT * FROM Producer p " +
@@ -29,31 +30,41 @@ public class ProducerRepositoryImpl implements ProducerRepository {
                                         "INNER JOIN ProducerDetails pd ON pd.producer_id = p.id " +
                                         "INNER JOIN Item i ON i.producer_id = p.id " +
                                         "WHERE i.id = $1", Tuple.of(id))
-                .onItem().apply(rs -> rs.iterator().hasNext() ? rowToProducer(rs) : null);
+                .onItem().apply(rs -> rowToProducer(rs));
     }
 
     private Producer rowToProducer(RowSet<Row> rs) {
-        Set<ProducerDetails> details = new HashSet<>();
+        if (rs == null) {
+            return Producer.builder().build();
+        }
 
+        List<ProducerDetails> details = new ArrayList<>();
+
+        Row singleRow = null;
         for (Row row : rs) {
+            singleRow = row;
             details.add(ProducerDetails.builder()
-                    .id(row.getLong(5)) //because it is present twice in a set
+                    .id(row.getLong(5))
                     .name(row.getString("name"))
                     .description(row.getString("description"))
                     .lang(Locale.forLanguageTag(row.getString("lang")))
                     .build());
         }
-        return buildProducer(details, rs.iterator().next());
+        return buildProducer(details, singleRow);
     }
 
-    private Producer buildProducer(Set<ProducerDetails> details, Row first) {
+    private Producer buildProducer(List<ProducerDetails> details, Row row) {
+        if (row == null) {
+            return Producer.builder().build();
+        }
+
         return Producer.builder()
-                .id(first.getLong("producer_id"))
+                .id(row.getLong("producer_id"))
                 .details(details)
                 .image(Image.builder()
-                        .id(first.getLong("image_id"))
-                        .alt(first.getString("alt"))
-                        .url(first.getString("url"))
+                        .id(row.getLong("image_id"))
+                        .alt(row.getString("alt"))
+                        .url(row.getString("url"))
                         .build())
                 .build();
     }

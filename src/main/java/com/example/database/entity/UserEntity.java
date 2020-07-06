@@ -7,8 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -23,9 +23,9 @@ public class UserEntity {
     private String email;
 
     @Builder.Default
-    private Set<UserType> permissions = new HashSet<>();
+    private List<UserType> permissions = new ArrayList<>();
 
     @Builder.Default
-    private Set<Address> addresses = new HashSet<>();
+    private List<Address> addresses = new ArrayList<>();
 
 }

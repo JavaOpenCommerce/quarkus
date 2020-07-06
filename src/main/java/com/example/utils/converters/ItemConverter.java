@@ -10,10 +10,10 @@ import com.example.database.entity.Item;
 import com.example.database.entity.Producer;
 import com.example.rest.dtos.ItemDto;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 public interface ItemConverter {
@@ -21,15 +21,15 @@ public interface ItemConverter {
 
     static ItemModel convertToModel(Item item) {
 
-        Set<CategoryModel> categoryModels = ofNullable(item.getCategory()).orElse(emptySet())
+        List<CategoryModel> categoryModels = ofNullable(item.getCategory()).orElse(emptyList())
                 .stream()
                 .map(category -> CategoryConverter.convertToModel(category))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
-        Set<ItemDetailModel> itemDetailModels = ofNullable(item.getDetails()).orElse(emptySet())
+        List<ItemDetailModel> itemDetailModels = ofNullable(item.getDetails()).orElse(emptyList())
                 .stream()
                 .map(itemDetails -> ItemDetailConverter.convertToModel(itemDetails))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         return ItemModel.builder()
                 .id(item.getId())

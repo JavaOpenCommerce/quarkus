@@ -1,7 +1,6 @@
 package com.example.database.services;
 
 import com.example.business.models.ItemModel;
-import com.example.database.entity.Category;
 import com.example.elasticsearch.SearchRequest;
 import com.example.elasticsearch.SearchService;
 import io.smallrye.mutiny.Uni;
@@ -46,16 +45,14 @@ public class StoreService {
 
         return itemService.getItemsListByIdList(filteredItemIds.await().indefinitely());
     }
-
-    private boolean validUserCategory(List<Category> categories) {
-        return categories.stream()
-                .flatMap(category -> category.getDetails().stream())
-                .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));
-    }
 }
 
 
-
+//    private boolean validUserCategory(List<Category> categories) {
+//        return categories.stream()
+//                .flatMap(category -> category.getDetails().stream())
+//                .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));
+//    }
 
 
 //    private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, List<Item> itemPanacheQuery) {

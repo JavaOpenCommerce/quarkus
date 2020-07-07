@@ -58,7 +58,7 @@ public class CardService {
     }
 
     public List<ItemModel> getShippingMethods() {
-        return null;
+        return null; //TODO
 //        return itemRepository.getShippingMethodList().stream()
 //                .map(i -> ItemConverter.convertToModel(i))
 //                .collect(Collectors.toList());

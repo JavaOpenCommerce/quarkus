@@ -21,6 +21,7 @@ import java.util.Map;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 @ApplicationScoped
 public class ItemRepositoryImpl implements ItemRepository {
@@ -80,7 +81,9 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     private List<Item> getItems(RowSet<Row> rs) {
-        if (rs == null) return emptyList();
+        if (rs == null) {
+            return emptyList();
+        }
 
         Map<Long, Item> items = new HashMap<>();
         for (Row row : rs) {
@@ -95,9 +98,7 @@ public class ItemRepositoryImpl implements ItemRepository {
                                     .getCategoryIds()
                                     .add(row.getLong("category_id")));
         }
-        return items.values()
-                .stream()
-                .collect(toList());
+        return new ArrayList<>(items.values());
     }
 
     private Item rowToItem(Row row) {
@@ -120,13 +121,13 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     private List<ItemDetails> getItemDetails(RowSet<Row> rs) {
-        if (rs == null) return emptyList();
-
-        List<ItemDetails> result = new ArrayList<>(rs.size());
-        for (Row row : rs) {
-            result.add(rowToItemDetails(row));
+        if (rs == null) {
+            return emptyList();
         }
-        return result;
+
+        return stream(rs.spliterator(), false)
+                .map(this::rowToItemDetails)
+                .collect(toList());
     }
 
     private ItemDetails rowToItemDetails(Row row) {

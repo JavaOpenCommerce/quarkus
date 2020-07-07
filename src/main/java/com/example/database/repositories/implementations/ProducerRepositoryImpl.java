@@ -20,6 +20,7 @@ import java.util.Map;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 @ApplicationScoped
 public class ProducerRepositoryImpl implements ProducerRepository {
@@ -45,7 +46,6 @@ public class ProducerRepositoryImpl implements ProducerRepository {
                                         "INNER JOIN Image img ON p.image_id = img.id " +
                                         "INNER JOIN ProducerDetails pd ON pd.producer_id = p.id ")
                 .onItem().apply(rs -> rowToProducerList(rs));
-
     }
 
     @Override
@@ -60,7 +60,9 @@ public class ProducerRepositoryImpl implements ProducerRepository {
     }
 
     private List<Producer> rowToProducerList(RowSet<Row> rs) {
-        if (rs == null) return emptyList();
+        if (rs == null) {
+            return emptyList();
+        }
 
         Map<Long, Producer> producers = new HashMap<>();
         for (Row row : rs) {
@@ -76,9 +78,7 @@ public class ProducerRepositoryImpl implements ProducerRepository {
                                     .getDetails()
                                     .add(rowToProducerDetails(row)));
         }
-        return producers.values()
-                .stream()
-                .collect(toList());
+        return new ArrayList<>(producers.values());
     }
 
     private Producer buildProducer(RowSet<Row> rs) {
@@ -86,14 +86,11 @@ public class ProducerRepositoryImpl implements ProducerRepository {
             return Producer.builder().build();
         }
 
-        List<ProducerDetails> details = new ArrayList<>();
+        List<ProducerDetails> details = stream(rs.spliterator(), false)
+                .map(this::rowToProducerDetails)
+                .collect(toList());
 
-        Row singleRow = null;
-        for (Row row : rs) {
-            singleRow = row;
-            details.add(rowToProducerDetails(row));
-        }
-        return buildProducer(singleRow, details);
+        return buildProducer(rs.iterator().next(), details);
     }
 
     private Producer buildProducer(Row row, List<ProducerDetails> details) {

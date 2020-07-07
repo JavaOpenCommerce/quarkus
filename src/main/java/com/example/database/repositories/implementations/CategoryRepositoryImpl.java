@@ -10,6 +10,7 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,7 +18,6 @@ import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 
 
 @ApplicationScoped
@@ -54,7 +54,9 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     private List<Category> rowToCategoryList(RowSet<Row> rs) {
-        if (rs == null) return emptyList();
+        if (rs == null) {
+            return emptyList();
+        }
 
         Map<Long, Category> categories = new HashMap<>();
         for (Row row : rs) {
@@ -73,9 +75,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
                                     .add(rowToCategoryDetail(row)));
         }
 
-        return categories.values()
-                .stream()
-                .collect(toList());
+        return new ArrayList<>(categories.values());
     }
 
     private CategoryDetails rowToCategoryDetail(Row row) {

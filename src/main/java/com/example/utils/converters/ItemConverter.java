@@ -12,10 +12,12 @@ import com.example.database.entity.ItemDetails;
 import com.example.database.entity.Producer;
 import com.example.rest.dtos.ItemDto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 public interface ItemConverter {
 
@@ -43,6 +45,32 @@ public interface ItemConverter {
                 .image(ImageConverter.convertToModel(
                         ofNullable(item.getImage()).orElse(Image.builder().build())))
                 .build();
+    }
+
+    static List<ItemModel> convertToItemModelList(List<Item> items,
+            List<ItemDetails> itemDetails,
+            List<Category> categories,
+            List<Producer> producers) {
+
+        List<ItemModel> itemModels = new ArrayList<>();
+        for (Item item : items) {
+            List<Category> categoriesFiltered = categories.stream()
+                    .filter(c -> item.getCategoryIds().contains(c.getId()))
+                    .collect(toList());
+
+            List<ItemDetails> itemDetailsFiltered = itemDetails.stream()
+                    .filter(id -> id.getItemId() == item.getId())
+                    .collect(toList());
+
+            Producer producerRetrieved = producers.stream()
+                    .filter(p -> p.getId() == item.getProducerId())
+                    .findAny()
+                    .orElse(Producer.builder().build());
+
+            itemModels
+                    .add(convertToModel(item, itemDetailsFiltered, categoriesFiltered, producerRetrieved));
+        }
+        return itemModels;
     }
 
     static ItemDto convertToDto(ItemModel item, String lang, String defaultLang) {

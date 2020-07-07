@@ -1,6 +1,7 @@
 package com.example.elasticsearch;
 
 import com.example.database.services.StoreService;
+import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.mutiny.core.Vertx;
@@ -31,7 +32,7 @@ public class SearchService {
                 .setDefaultHost(address.getHost()));
     }
 
-    public void searchItemsByCategoryNProducer(SearchRequest request) {
+    public Uni<JsonObject> searchItemsBySearchRequest(SearchRequest request) {
 
         SearchSourceBuilder ssb = new SearchSourceBuilder();
 
@@ -50,7 +51,7 @@ public class SearchService {
 
         log.info(query);
 
-        client.get("/items/_search?filter_path=hits.hits._id")
+        return client.get("/items/_search?filter_path=hits.hits._id")
                 .putHeader("Content-Length", "" + query.length())
                 .putHeader("Content-Type", "application/json")
                 .sendJsonObject(new JsonObject(query)).onItem().apply(resp -> {
@@ -61,7 +62,9 @@ public class SearchService {
                                 .put("code", resp.statusCode())
                                 .put("message", resp.bodyAsString());
                     }
-                }).subscribe().with(result -> log.info(result),
-                        failure -> log.info(failure.getMessage()));
+                });
+
+//                .subscribe().with(result -> log.info(result),
+//                        failure -> log.info(failure.getMessage()));
     }
 }

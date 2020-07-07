@@ -29,21 +29,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     public ItemRepositoryImpl(PgPool client) {this.client = client;}
 
-    @Override
-    public List<Item> listItemByCategoryId(Long categoryId, int pageIndex, int pageSize) {
-        return null;
-    }
-
-    @Override
-    public List<Item> listItemByProducerId(Long producerId, int pageIndex, int pageSize) {
-        return null;
-    }
-
-    @Override
-    public List<Item> getShippingMethodList() {
-        return null;
-    }
-
 
     @Override
     public Uni<List<Item>> getAllItems() {
@@ -67,6 +52,15 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
+    public Uni<List<Item>> getItemsListByIdList(List<Long> ids) {
+        return client.preparedQuery("SELECT * FROM Item i " +
+                                        "INNER JOIN Image img ON i.image_id = img.id " +
+                                        "INNER JOIN item_category ON item_category.item_id = i.id " +
+                                        "WHERE i.id = ANY ($1)", Tuple.of(ids.toArray(new Long[ids.size()])))
+                .onItem().apply(rs -> getItems(rs));
+    }
+
+    @Override
     public Uni<List<ItemDetails>> getAllItemDetails() {
         return client.preparedQuery("SELECT * FROM ITEMDETAILS")
                 .onItem().apply(rs -> getItemDetails(rs));
@@ -75,6 +69,13 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Uni<List<ItemDetails>> getItemDetailsListByItemId(Long id) {
         return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = $1", Tuple.of(id))
+                .onItem().apply(rs -> getItemDetails(rs));
+    }
+
+    @Override
+    public Uni<List<ItemDetails>> getItemDetailsListByIdList(List<Long> ids) {
+        return client.preparedQuery("SELECT * FROM ITEMDETAILS WHERE item_id = ANY ($1)",
+                                        Tuple.of(ids.toArray(new Long[ids.size()])))
                 .onItem().apply(rs -> getItemDetails(rs));
     }
 

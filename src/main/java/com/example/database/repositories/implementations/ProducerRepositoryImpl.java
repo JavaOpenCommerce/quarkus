@@ -48,6 +48,17 @@ public class ProducerRepositoryImpl implements ProducerRepository {
 
     }
 
+    @Override
+    public Uni<List<Producer>> getProducersListByIdList(List<Long> ids) {
+        return client.preparedQuery("SELECT * FROM Producer p " +
+                                        "INNER JOIN Image img ON p.image_id = img.id " +
+                                        "INNER JOIN ProducerDetails pd ON pd.producer_id = p.id " +
+                                        "INNER JOIN Item i ON i.producer_id = p.id " +
+                                        "WHERE i.id = ANY ($1)",
+                                        Tuple.of(ids.toArray(new Long[ids.size()])))
+                .onItem().apply(rs -> rowToProducerList(rs));
+    }
+
     private List<Producer> rowToProducerList(RowSet<Row> rs) {
         if (rs == null) return emptyList();
 

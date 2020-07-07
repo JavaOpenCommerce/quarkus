@@ -1,82 +1,66 @@
 package com.example.database.services;
 
-import com.example.business.models.CategoryModel;
 import com.example.business.models.ItemModel;
-import com.example.business.models.PageModel;
-import com.example.business.models.ProducerModel;
 import com.example.database.entity.Category;
-import com.example.database.entity.Item;
-import com.example.database.entity.Producer;
-import com.example.database.repositories.interfaces.ItemRepository;
+import com.example.elasticsearch.SearchRequest;
 import com.example.elasticsearch.SearchService;
-import com.example.utils.converters.CategoryConverter;
-import com.example.utils.converters.ProducerConverter;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.json.JsonArray;
 import lombok.extern.jbosslog.JBossLog;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @JBossLog
 @ApplicationScoped
 public class StoreService {
 
-    private final ItemRepository itemRepository;
-    private final ItemAssemblingService itemAssemblingService;
+    private final ItemService itemService;
     private final SearchService searchService;
 
 
 
-    public StoreService(ItemRepository itemRepository,
-            ItemAssemblingService itemAssemblingService, SearchService searchService) {
-        this.itemRepository = itemRepository;
-        this.itemAssemblingService = itemAssemblingService;
+    public StoreService(ItemService itemService, SearchService searchService) {
+        this.itemService = itemService;
         this.searchService = searchService;
     }
 
     public Uni<ItemModel> getItemById(Long id) {
-        //TOdo
-        return itemAssemblingService.getSingleItem(id);
+        return itemService.getItemById(id);
     }
 
-    public List<CategoryModel> getCategoryList() {
-        return new ArrayList<Category>().stream() //TODO
-                .filter(c -> c.getDetails().stream()
-                        .allMatch(detail -> !"shipping".equalsIgnoreCase(detail.getName())))
-                .map(c -> CategoryConverter.convertToModel(c))
-                .collect(Collectors.toList());
+    public Uni<List<ItemModel>> getFilteredItems(SearchRequest request) {
+
+        Uni<List<Long>> filteredItemIds = searchService
+                .searchItemsBySearchRequest(request).onItem().apply(json -> {
+                    JsonArray hits = json
+                            .getJsonObject("hits")
+                            .getJsonArray("hits");
+                    List<Long> ids = new ArrayList<>();
+                    for (int i = 0; i < hits.size(); i++) {
+                        ids.add(Long.parseLong(hits.getJsonObject(i).getString("_id")));
+                    }
+                    return ids;
+                });
+
+        return itemService.getItemsListByIdList(filteredItemIds.await().indefinitely());
     }
 
-    public List<ProducerModel> getProducerList() {
-        return new ArrayList<Producer>().stream() //TODO
-                .map(p -> ProducerConverter.convertToModel(p))
-                .collect(Collectors.toList());
+    private boolean validUserCategory(List<Category> categories) {
+        return categories.stream()
+                .flatMap(category -> category.getDetails().stream())
+                .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));
     }
+}
 
-    public PageModel<ItemModel> getPageOfAllItems(int pageIndex, int pageSize) {
-        List<Item> page = new ArrayList<>(); //TODO
-        return getItemModelPage(pageIndex, pageSize, page);
-    }
 
-    public PageModel<ItemModel> getItemsPageByCategory(Long categoryId, int pageIndex, int pageSize) {
-        List<Item> itemPanacheQuery = itemRepository
-                .listItemByCategoryId(categoryId, pageIndex, pageSize);
 
-        return getItemModelPage(pageIndex, pageSize, itemPanacheQuery);
-    }
 
-    public PageModel<ItemModel> getItemsPageByProducer(Long producerId, int pageIndex, int pageSize) {
-        List<Item> itemPanacheQuery = itemRepository
-                .listItemByProducerId(producerId, pageIndex, pageSize);
 
-        return getItemModelPage(pageIndex, pageSize, itemPanacheQuery);
-    }
-
-    private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, List<Item> itemPanacheQuery) {
-
-        return null; //todo
+//    private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, List<Item> itemPanacheQuery) {
+//
+//        return null; //todo
 //        List<ItemModel> itemModels = itemPanacheQuery.stream() //TODO
 //                //.filter(i -> validUserCategory(i.getCategory())) //TODO
 //                .map(i -> ItemConverter.convertToModel(i))
@@ -89,11 +73,4 @@ public class StoreService {
 //                .totalElementsCount(0) //TODO
 //                .items(itemModels)
 //                .build();
-    }
-
-    private boolean validUserCategory(List<Category> categories) {
-        return categories.stream()
-                .flatMap(category -> category.getDetails().stream())
-                .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));
-    }
-}
+//    }

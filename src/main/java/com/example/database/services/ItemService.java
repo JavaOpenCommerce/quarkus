@@ -11,29 +11,28 @@ import com.example.database.repositories.interfaces.ProducerRepository;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.utils.converters.ItemConverter.convertToItemModelList;
 import static com.example.utils.converters.ItemConverter.convertToModel;
 import static io.smallrye.mutiny.Uni.combine;
-import static java.util.stream.Collectors.toList;
 
 @ApplicationScoped
-public class ItemAssemblingService {
+public class ItemService {
 
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final ProducerRepository producerRepository;
 
 
-    public ItemAssemblingService(ItemRepository itemRepository,
+    public ItemService(ItemRepository itemRepository,
             CategoryRepository categoryRepository, ProducerRepository producerRepository) {
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.producerRepository = producerRepository;
     }
 
-    public Uni<ItemModel> getSingleItem(Long id) {
+    public Uni<ItemModel> getItemById(Long id) {
         Uni<Item> itemUni = itemRepository.getItemById(id);
         Uni<List<ItemDetails>> itemDetailsUni = itemRepository.getItemDetailsListByItemId(id);
         Uni<List<Category>> categoriesUni = categoryRepository.getCategoriesByItemId(id);
@@ -46,7 +45,7 @@ public class ItemAssemblingService {
                                 convertToModel(item, itemDetails, categories, producer));
     }
 
-    public Uni<List<ItemModel>> getFullItemList() {
+    public Uni<List<ItemModel>> getAllItems() {
         Uni<List<Item>> itemsUni = itemRepository.getAllItems();
         Uni<List<Category>> categoriesUni = categoryRepository.getAll();
         Uni<List<ItemDetails>> itemDetailsUni = itemRepository.getAllItemDetails();
@@ -56,32 +55,18 @@ public class ItemAssemblingService {
                 .unis(itemsUni, itemDetailsUni, categoriesUni, producersUni)
                 .combinedWith(
                         (items, itemDetails, categories, producers) ->
-                                assembleItemModelList(items, itemDetails, categories, producers));
+                                convertToItemModelList(items, itemDetails, categories, producers));
     }
 
-    private List<ItemModel> assembleItemModelList(List<Item> items,
-            List<ItemDetails> itemDetails,
-            List<Category> categories,
-            List<Producer> producers) {
+    public Uni<List<ItemModel>> getItemsListByIdList(List<Long> ids) {
+        Uni<List<Item>> itemsUni = itemRepository.getItemsListByIdList(ids);
+        Uni<List<ItemDetails>> itemDetailsUni = itemRepository.getItemDetailsListByIdList(ids);
+        Uni<List<Category>> categoriesUni = categoryRepository.getCategoriesListByIdList(ids);
+        Uni<List<Producer>> producersUni = producerRepository.getProducersListByIdList(ids);
 
-        List<ItemModel> itemModels = new ArrayList<>();
-        for (Item item : items) {
-            List<Category> categoriesFiltered = categories.stream()
-                    .filter(c -> item.getCategoryIds().contains(c.getId()))
-                    .collect(toList());
-
-            List<ItemDetails> itemDetailsFiltered = itemDetails.stream()
-                    .filter(id -> id.getItemId() == item.getId())
-                    .collect(toList());
-
-            Producer producerRetrieved = producers.stream()
-                    .filter(p -> p.getId() == item.getProducerId())
-                    .findAny()
-                    .orElse(Producer.builder().build());
-
-            itemModels
-                    .add(convertToModel(item, itemDetailsFiltered, categoriesFiltered, producerRetrieved));
-        }
-        return itemModels;
+        return combine().all()
+                .unis(itemsUni, itemDetailsUni, categoriesUni, producersUni)
+                .combinedWith((items, itemDetails, categories, producers) ->
+                        convertToItemModelList(items, itemDetails, categories, producers));
     }
 }

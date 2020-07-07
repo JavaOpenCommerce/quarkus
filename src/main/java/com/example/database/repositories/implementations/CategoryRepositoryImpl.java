@@ -31,16 +31,25 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     @Override
     public Uni<List<Category>> getAll() {
         return client.preparedQuery("SELECT * FROM Category c " +
-                "INNER JOIN categorydetails cd ON cd.category_id = c.id ")
+                                        "INNER JOIN categorydetails cd ON cd.category_id = c.id ")
                 .onItem().apply(rs -> rowToCategoryList(rs));
     }
 
     @Override
     public Uni<List<Category>> getCategoriesByItemId(Long id) {
         return client.preparedQuery("SELECT * FROM Category c " +
-                "INNER JOIN categorydetails cd ON cd.category_id = c.id " +
-                "INNER JOIN item_category ic ON ic.category_id = c.id " +
-                "WHERE ic.item_id = $1", Tuple.of(id))
+                                        "INNER JOIN categorydetails cd ON cd.category_id = c.id " +
+                                        "INNER JOIN item_category ic ON ic.category_id = c.id " +
+                                        "WHERE ic.item_id = $1", Tuple.of(id))
+                .onItem().apply(rs -> rowToCategoryList(rs));
+    }
+
+    @Override
+    public Uni<List<Category>> getCategoriesListByIdList(List<Long> ids) {
+        return client.preparedQuery("SELECT * FROM Category c " +
+                                        "INNER JOIN categorydetails cd ON cd.category_id = c.id " +
+                                        "INNER JOIN item_category ic ON ic.category_id = c.id " +
+                                        "WHERE ic.item_id = ANY ($1)", Tuple.of(ids.toArray(new Long[ids.size()])))
                 .onItem().apply(rs -> rowToCategoryList(rs));
     }
 

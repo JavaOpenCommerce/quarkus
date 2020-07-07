@@ -12,16 +12,11 @@ public interface ItemRepository {
 
     Uni<Item> getItemById(Long id);
 
+    Uni<List<Item>> getItemsListByIdList(List<Long> ids);
+
     Uni<List<ItemDetails>> getAllItemDetails();
 
     Uni<List<ItemDetails>> getItemDetailsListByItemId(Long id);
 
-    List<Item> listItemByCategoryId(Long categoryId, int pageIndex, int pageSize);
-
-    List<Item> listItemByProducerId(Long producerId, int pageIndex, int pageSize);
-
-    List<Item> getShippingMethodList();
-
-
-
+    Uni<List<ItemDetails>> getItemDetailsListByIdList(List<Long> ids);
 }

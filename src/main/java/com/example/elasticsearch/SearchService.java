@@ -42,7 +42,10 @@ public class SearchService {
                         matchQuery("categoryIds", request.getCategoryId()))
                 .must(request.getProducerId() == null || request.getProducerId() == 0 ?
                         matchAllQuery() :
-                        matchQuery("producerId", request.getProducerId())))
+                        matchQuery("producerId", request.getProducerId()))
+                .must(request.getSearchQuery() == null || request.getSearchQuery().isEmpty() ?
+                        matchAllQuery() :
+                        matchQuery("details.name", request.getSearchQuery())))
                 .sort(new FieldSortBuilder(request.getSortBy()).order(SortOrder.valueOf(request.getOrder()
                         .toUpperCase())))
                 .from(request.getPageSize() * request.getPageNum())

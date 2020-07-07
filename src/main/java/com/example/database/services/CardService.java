@@ -30,10 +30,7 @@ public class CardService {
         Item item = Optional.ofNullable(new Item()) //TODO
                 .orElseThrow(() ->
                         new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
-        return null; //todo
-
-//        return ItemConverter
-//                .convertToModel(item);
+        return null; //TODO
     }
 
     public int checkItemStock(Long id) {

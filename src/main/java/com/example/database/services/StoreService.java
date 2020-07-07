@@ -8,8 +8,11 @@ import io.vertx.core.json.JsonArray;
 import lombok.extern.jbosslog.JBossLog;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Long.parseLong;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 @JBossLog
 @ApplicationScoped
@@ -17,7 +20,6 @@ public class StoreService {
 
     private final ItemService itemService;
     private final SearchService searchService;
-
 
 
     public StoreService(ItemService itemService, SearchService searchService) {
@@ -33,14 +35,16 @@ public class StoreService {
 
         Uni<List<Long>> filteredItemIds = searchService
                 .searchItemsBySearchRequest(request).onItem().apply(json -> {
+                    if (json == null || json.isEmpty() || json.getJsonObject("hits") == null) {
+                        return emptyList();
+                    }
                     JsonArray hits = json
                             .getJsonObject("hits")
                             .getJsonArray("hits");
-                    List<Long> ids = new ArrayList<>();
-                    for (int i = 0; i < hits.size(); i++) {
-                        ids.add(Long.parseLong(hits.getJsonObject(i).getString("_id")));
-                    }
-                    return ids;
+
+                    return hits.stream()
+                            .map(id -> parseLong(id.toString().split("\"")[3]))
+                            .collect(toList());
                 });
 
         return itemService.getItemsListByIdList(filteredItemIds.await().indefinitely());

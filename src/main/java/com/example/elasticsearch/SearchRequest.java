@@ -32,5 +32,9 @@ public class SearchRequest {
     @DefaultValue("id")
     private String sortBy;
 
+    @QueryParam("searchQuery")
+    @DefaultValue("")
+    private String searchQuery;
+
 
 }

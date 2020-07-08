@@ -21,7 +21,6 @@ import static java.util.stream.Collectors.toList;
 
 public interface ItemConverter {
 
-
     static ItemModel convertToModel(Item item, List<ItemDetails> itemDetails, List<Category> categories, Producer producer) {
 
         List<ItemDetailModel> details = itemDetails.stream()

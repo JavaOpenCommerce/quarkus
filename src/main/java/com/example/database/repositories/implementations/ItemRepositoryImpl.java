@@ -57,7 +57,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         return client.preparedQuery("SELECT * FROM Item i " +
                                         "INNER JOIN Image img ON i.image_id = img.id " +
                                         "INNER JOIN item_category ON item_category.item_id = i.id " +
-                                        "WHERE i.id = ANY ($1)", Tuple.of(ids.toArray(new Long[ids.size()])))
+                                        "WHERE i.id = ANY ($1) ORDER BY i.id DESC", Tuple.of(ids.toArray(new Long[ids.size()])))
                 .onItem().apply(rs -> getItems(rs));
     }
 

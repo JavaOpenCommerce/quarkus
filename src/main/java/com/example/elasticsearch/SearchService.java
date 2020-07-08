@@ -54,7 +54,7 @@ public class SearchService {
 
         log.info(query);
 
-        return client.get("/items/_search?filter_path=hits.hits._id")
+        return client.get("/items/_search?filter_path=hits.hits._id,hits.total.value")
                 .putHeader("Content-Length", "" + query.length())
                 .putHeader("Content-Type", "application/json")
                 .sendJsonObject(new JsonObject(query)).onItem().apply(resp -> {

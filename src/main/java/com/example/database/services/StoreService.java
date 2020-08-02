@@ -105,7 +105,7 @@ public class StoreService {
 
     private PageModel<ItemModel> getItemModelPage(int pageIndex, int pageSize, int totalCount, List<ItemModel> items) {
 
-        int pageCount = (int) Math.ceil((double)totalCount / pageSize);
+        int pageCount = (int) Math.ceil((double) totalCount / pageSize);
 
         return PageModel.<ItemModel>builder()
                 .pageCount(pageCount)

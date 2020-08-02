@@ -3,10 +3,14 @@
 
 
 quarkus:
+  http:
+    auth:
+      form:
+        cookie-name: StoreCardCookie
 
   #datasource settings
   datasource:
-    url: vertx-reactive:postgresql://localhost:5432/main_postgres_db?currentSchema=main_store_db
+    url: vertx-reactive:postgresql://localhost:5432/main_postgres_db
     username: ${QUARKUS_DATASOURCE_USERNAME}
     password: ${QUARKUS_DATASOURCE_PASSWORD}
 

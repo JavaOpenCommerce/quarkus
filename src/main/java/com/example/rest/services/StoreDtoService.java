@@ -15,6 +15,7 @@ import com.example.utils.converters.ProducerConverter;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -40,7 +41,15 @@ public class StoreDtoService {
     public Uni<PageDto<ItemDto>> getFilteredItems(SearchRequest request) {
 
         return storeService.getFilteredItemsPage(request).onItem()
-                .apply(itemPage -> ItemPageConverter.convertToDto(itemPage, langRes.getLanguage(), langRes.getDefault()));
+                .apply(itemPage -> {
+                    PageDto<ItemDto> itemDtoPageDto = ItemPageConverter.convertToDto(itemPage,
+                            langRes.getLanguage(),
+                            langRes.getDefault());
+
+                    sortItems(itemDtoPageDto.getItems(), request);
+
+                    return itemDtoPageDto;
+                });
     }
 
     public Uni<List<CategoryDto>> getAllCategories() {
@@ -55,5 +64,26 @@ public class StoreDtoService {
                 producerModels.stream()
                         .map(prod -> ProducerConverter.convertToDto(prod, langRes.getLanguage(), langRes.getDefault()))
                         .collect(toList()));
+    }
+
+    private void sortItems(List<ItemDto> itemDtos, SearchRequest request) {
+
+        String sortingType = request.getSortBy().toUpperCase() + "-" + request.getOrder().toUpperCase();
+
+        switch (sortingType) {
+            case "VALUE-ASC":
+                itemDtos.sort(Comparator.comparing(ItemDto::getValueGross));
+                break;
+            case "VALUE-DESC":
+                itemDtos.sort(Comparator.comparing(ItemDto::getValueGross).reversed());
+                break;
+            case "NAME-ASC":
+            default:
+                itemDtos.sort(Comparator.comparing(ItemDto::getName));
+                break;
+            case "NAME-DESC":
+                itemDtos.sort(Comparator.comparing(ItemDto::getName).reversed());
+                break;
+        }
     }
 }

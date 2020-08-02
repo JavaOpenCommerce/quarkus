@@ -28,8 +28,8 @@ public class SearchRequest {
     @DefaultValue("ASC")
     private String order;
 
-    @QueryParam("sort")
-    @DefaultValue("id")
+    @QueryParam("sortBy")
+    @DefaultValue("name")
     private String sortBy;
 
     @QueryParam("searchQuery")

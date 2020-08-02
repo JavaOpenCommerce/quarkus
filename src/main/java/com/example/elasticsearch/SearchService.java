@@ -9,8 +9,6 @@ import io.vertx.mutiny.ext.web.client.WebClient;
 import lombok.extern.jbosslog.JBossLog;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.FieldSortBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -46,8 +44,6 @@ public class SearchService {
                 .must(request.getSearchQuery() == null || request.getSearchQuery().isEmpty() ?
                         matchAllQuery() :
                         matchQuery("details.name", request.getSearchQuery())))
-                .sort(new FieldSortBuilder(request.getSortBy()).order(SortOrder.valueOf(request.getOrder()
-                        .toUpperCase())))
                 .from(request.getPageSize() * request.getPageNum())
                 .size(request.getPageSize())
                 .toString();
@@ -66,8 +62,5 @@ public class SearchService {
                                 .put("message", resp.bodyAsString());
                     }
                 });
-
-//                .subscribe().with(result -> log.info(result),
-//                        failure -> log.info(failure.getMessage()));
     }
 }

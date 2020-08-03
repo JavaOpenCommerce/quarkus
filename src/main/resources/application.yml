@@ -3,10 +3,6 @@
 
 
 quarkus:
-  http:
-    auth:
-      form:
-        cookie-name: StoreCardCookie
 
   #datasource settings
   datasource:

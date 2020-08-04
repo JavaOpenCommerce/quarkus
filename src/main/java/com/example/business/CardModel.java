@@ -47,9 +47,7 @@ public final class CardModel {
 
         if (amount <= 0) {
             products.remove(productId);
-        }
-
-        if (amount <= stock) {
+        } else if (amount <= stock) {
             product.setAmount(amount);
         } else {
             product.setAmount(stock);

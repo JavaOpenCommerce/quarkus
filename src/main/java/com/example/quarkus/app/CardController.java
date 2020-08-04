@@ -53,7 +53,11 @@ public class CardController {
 
     private void addCookieIfNotPresent() {
         if (cookieCheck()) {
-            request.cookieMap().put(COOKIE_NAME, Cookie.cookie(COOKIE_NAME, generateValue()));
+            request
+                    .cookieMap()
+                    .put(COOKIE_NAME, Cookie.cookie(COOKIE_NAME, generateValue())
+                            .setMaxAge(60L*60L*1000L)
+                            .setHttpOnly(true));
         }
     }
 

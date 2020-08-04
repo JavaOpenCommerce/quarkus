@@ -22,18 +22,27 @@ public class CardDtoService {
         this.langResolver = langResolver;
     }
 
+    public Uni<CardDto> addProductToCard(Product product, String id) {
+        return cardService
+                .addProductToCard(product, id)
+                .onItem()
+                .apply(cardModel -> CardConverter
+                        .convertToDto(cardModel, langResolver.getLanguage(), langResolver.getDefault()));
+    }
+
+    public Uni<CardDto> getCard(String id) {
+        return cardService
+                .getCard(id)
+                .onItem()
+                .apply(cardModel -> CardConverter
+                        .convertToDto(cardModel, langResolver.getLanguage(), langResolver.getDefault()));
+    }
+
     public List<ItemDto> getShippingMethods() {
+        //todo
         return null;
 //        cardService.getShippingMethods().stream()
 //                .map(i -> ItemConverter.convertToDto(i, langResolver.getLanguage(), langResolver.getDefault()))
 //                .collect(Collectors.toList());
-    }
-
-    public Uni<CardDto> getCard(List<Product> products) {
-        return cardService
-                .getCard(products)
-                .onItem()
-                .apply(cardModel -> CardConverter
-                        .convertToDto(cardModel, "pl-PL", langResolver.getDefault()));
     }
 }

@@ -1,11 +1,15 @@
 package com.example.utils.converters;
 
 import com.example.business.CardModel;
+import com.example.database.entity.Product;
 import com.example.rest.dtos.CardDto;
 import com.example.rest.dtos.ProductDto;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 public interface CardConverter {
 
@@ -21,5 +25,15 @@ public interface CardConverter {
                 .deliveryAddress(null)
                 .products(productDtos)
                 .build();
+    }
+
+    static List<Product> convertToProductList(CardModel cardModel) {
+        return cardModel.getProducts().values()
+                .stream()
+                .map(p -> Product.builder()
+                        .itemId(p.getItemModel().getId())
+                        .amount(p.getAmount().asInteger())
+                        .build())
+                .collect(toList());
     }
 }

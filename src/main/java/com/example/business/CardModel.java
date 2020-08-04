@@ -27,33 +27,35 @@ public final class CardModel {
         calculateCardValue();
     }
 
-    public void addProductToCard(ItemModel item) {
+    public void addProductToCard(ItemModel item, int amount) {
+        if (item.getStock() < 1) {
+            return;
+            //todo handling, issue #6
+        }
+
         Long id = item.getId();
-        if (products.containsKey(id)) {
-            updateProductAmount(id, products.get(id).getAmount().asInteger() + 1);
-        } else {
+        if (!products.containsKey(id)) {
             ProductModel product = ProductModel.getProduct(item);
             products.put(id, product);
         }
+
+        updateProductAmount(id, amount, item.getStock());
     }
 
-    public void removeProductById(Long id) {
-        products.remove(id);
-    }
+    public void updateProductAmount(Long productId, int amount, int stock) {
+        ProductModel product = products.get(productId);
 
-    public void updateProductAmount(Long productId, int amount) {
+        if (amount <= 0) {
+            products.remove(productId);
+        }
 
-//        ProductModel product = products.get(productId);
-//        int stock = cardService.checkItemStock(productId);
-//        if (amount <= stock) {
-//           product.setAmount(amount);
-//        } else {
-//            product.setAmount(stock);
-//        }
-//        if (amount <= 0) {
-//            products.remove(productId);
-//        }
-//        calculateCardValue();
+        if (amount <= stock) {
+            product.setAmount(amount);
+        } else {
+            product.setAmount(stock);
+        }
+
+        calculateCardValue();
     }
 
     public void calculateCardValue() {
@@ -68,7 +70,4 @@ public final class CardModel {
                 .reduce(ZERO, BigDecimal::add));
     }
 
-//    public void setDeliveryAddress(Long id) {
-//        this.deliveryAddress = cardService.getAddressModel(id);
-//    }
 }

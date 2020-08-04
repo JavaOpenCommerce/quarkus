@@ -5,10 +5,10 @@ import com.example.business.models.AddressModel;
 import com.example.business.models.ItemModel;
 import com.example.business.models.ProductModel;
 import com.example.database.entity.Address;
-import com.example.database.entity.Item;
 import com.example.database.entity.Product;
-import com.example.database.repositories.interfaces.AddressRepository;
+import com.example.database.repositories.implementations.CardRepositoryImpl;
 import com.example.utils.converters.AddressConverter;
+import com.example.utils.converters.CardConverter;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -25,17 +25,34 @@ import static java.util.stream.Collectors.toList;
 public class CardService {
 
     private final ItemService itemService;
-    private final AddressRepository addressRepository;
+    private final CardRepositoryImpl cardRepository;
 
-    public CardService(ItemService itemService, AddressRepository addressRepository) {
+    public CardService(ItemService itemService, CardRepositoryImpl cardRepository) {
         this.itemService = itemService;
-        this.addressRepository = addressRepository;
+        this.cardRepository = cardRepository;
     }
 
-    public Uni<ItemModel> getItemModel(Long id) {
-        return ofNullable(itemService.getItemById(id)) //TODO
+    public Uni<CardModel> getCard(String id) {
+        return cardRepository.getCardList(id).onItem().apply(products ->
+            getCardProducts(products).onItem().apply(map -> new CardModel(map)).await().indefinitely());
+    }
+
+    public Uni<CardModel> addProductToCard(Product product, String id) {
+        return Uni.combine().all().unis(getCard(id), itemService.getItemById(product.getItemId()))
+                .combinedWith((cardModel, itemModel) -> {
+                    cardModel.addProductToCard(itemModel, product.getAmount());
+                    cardRepository.saveCard(id, CardConverter.convertToProductList(cardModel));
+                    return cardModel;
+        });
+    }
+
+    public AddressModel getAddressModel(Long id) {
+        Address address = ofNullable(new Address()) //TODO
                 .orElseThrow(() ->
-                        new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
+                        new WebApplicationException("Address with id " + id + " not found", Response.Status.NOT_FOUND));
+
+        return AddressConverter
+                .convertToModel(address);
     }
 
     private Uni<Map<Long, ProductModel>> getCardProducts(List<Product> products) {
@@ -55,31 +72,6 @@ public class CardService {
             }
             return cardProducts;
         });
-    }
-
-    public Uni<CardModel> getCard(List<Product> products) {
-        return getCardProducts(products).onItem().apply(map -> new CardModel(map));
-    }
-
-    public int checkItemStock(Long id) {
-        Item item = ofNullable(new Item()) //TODO
-                .orElseThrow(() ->
-                        new WebApplicationException("Item with id " + id + " not found", Response.Status.NOT_FOUND));
-
-        if (item.getStock() < 1) {
-            //todo handling, issue #6
-        }
-
-        return item.getStock();
-    }
-
-    public AddressModel getAddressModel(Long id) {
-        Address address = ofNullable(new Address()) //TODO
-                .orElseThrow(() ->
-                        new WebApplicationException("Address with id " + id + " not found", Response.Status.NOT_FOUND));
-
-        return AddressConverter
-                .convertToModel(address);
     }
 
     public List<ItemModel> getShippingMethods() {

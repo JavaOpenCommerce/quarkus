@@ -7,7 +7,6 @@ import com.example.rest.dtos.ItemDto;
 import com.example.utils.LanguageResolver;
 import com.example.utils.converters.CardConverter;
 import io.smallrye.mutiny.Uni;
-import io.vertx.ext.web.RoutingContext;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
@@ -30,11 +29,11 @@ public class CardDtoService {
 //                .collect(Collectors.toList());
     }
 
-    public Uni<CardDto> getCard(List<Product> products, RoutingContext routingContext) {
+    public Uni<CardDto> getCard(List<Product> products) {
         return cardService
                 .getCard(products)
                 .onItem()
                 .apply(cardModel -> CardConverter
-                        .convertToDto(cardModel, langResolver.getLanguage(routingContext), langResolver.getDefault()));
+                        .convertToDto(cardModel, "pl-PL", langResolver.getDefault()));
     }
 }

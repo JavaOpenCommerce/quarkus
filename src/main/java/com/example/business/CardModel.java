@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.math.BigDecimal.ZERO;
@@ -23,11 +24,11 @@ public final class CardModel {
 
 
     public CardModel(Map<Long, ProductModel> products) {
-        this.products = products;
+        this.products = new HashMap<>(products);
         calculateCardValue();
     }
 
-    public void addProductToCard(ItemModel item, int amount) {
+    public void addProduct(ItemModel item, int amount) {
         if (item.getStock() < 1) {
             return;
             //todo handling, issue #6
@@ -42,7 +43,7 @@ public final class CardModel {
         updateProductAmount(id, amount, item.getStock());
     }
 
-    public void updateProductAmount(Long productId, int amount, int stock) {
+    private void updateProductAmount(Long productId, int amount, int stock) {
         ProductModel product = products.get(productId);
 
         if (amount <= 0) {
@@ -52,7 +53,6 @@ public final class CardModel {
         } else {
             product.setAmount(stock);
         }
-
         calculateCardValue();
     }
 

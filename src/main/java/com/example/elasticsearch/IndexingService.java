@@ -5,10 +5,10 @@ import com.example.database.services.ItemService;
 import com.example.utils.converters.SearchItemConverter;
 import io.quarkus.runtime.StartupEvent;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
-import io.vertx.reactivex.core.Vertx;
-import io.vertx.reactivex.ext.web.client.WebClient;
 import lombok.extern.jbosslog.JBossLog;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -21,7 +21,6 @@ import static java.util.stream.Collectors.toList;
 @ApplicationScoped
 public class IndexingService {
 
-    //Should switch to mutiny instead of reactivex !!
     private WebClient client;
     private final ItemService itemService;
 

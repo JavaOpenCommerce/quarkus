@@ -34,7 +34,7 @@ public class CardRepositoryImpl implements CardRepository {
         Promise<List<Product>> promise = promise();
         redisAPI.get(id, res -> {
             if (!res.succeeded()) {
-                log.warnf("Failed to store in redis, with message: %", res.cause());
+                log.warnf("Failed to get card, with message: {}", res.cause());
             }
             promise.complete(ofNullable(res.result())
                             .map(r -> jsonToPojo(r.toString()))
@@ -44,17 +44,20 @@ public class CardRepositoryImpl implements CardRepository {
     }
 
     @Override
-    public void saveCard(String id, List<Product> products) {
+    public Uni<List<Product>> saveCard(String id, List<Product> products) {
+        Promise<List<Product>> promise = promise();
         redisAPI.set(List.of(id, Json.encode(products)),res -> {
-            if (res.succeeded()) {
-                log.info("Card successfully persisted in redis");
-            } else {
-                log.warn(res.cause());
+            if (!res.succeeded()) {
+                log.warnf("Failed to store in redis, with message: {}", res.cause());
             }
+            log.info("Card successfully persisted in redis, status: " + res.result().toString());
+            promise.complete(products);
         });
+        return promise.future().onComplete();
+
     }
 
     private List<Product> jsonToPojo(String json) {
-        return jsonb.fromJson(json, new ArrayList<Product>() {}.getClass().getGenericSuperclass());
+        return jsonb.fromJson(json, new ArrayList<Product>(){}.getClass().getGenericSuperclass());
     }
 }

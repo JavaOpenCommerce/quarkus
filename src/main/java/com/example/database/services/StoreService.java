@@ -48,14 +48,11 @@ public class StoreService {
     }
 
     public Uni<PageModel<ItemModel>> getFilteredItemsPage(SearchRequest request) {
-        return getFilteredResults(request).onItem().apply(results -> {
-            List<ItemModel> items = itemService
+        return getFilteredResults(request).onItem().produceUni(results ->
+            itemService
                     .getItemsListByIdList(results.getLeft())
-                    .await()
-                    .indefinitely(); //in my opinion it is kind of violating reactive chain, mm?
-
-            return getItemModelPage(request.getPageNum(), request.getPageSize(), results.getRight(), items);
-        });
+                    .onItem()
+                    .apply(items -> getItemModelPage(request.getPageNum(), request.getPageSize(), results.getRight(), items)));
     }
 
     public Uni<List<CategoryModel>> getAllCategories() {
@@ -79,17 +76,18 @@ public class StoreService {
         return searchService
                 .searchItemsBySearchRequest(request).onItem().apply(json -> {
 
-                    //this logic monster works awesome, and provides full npe protection, but looks ugly as hell...
+                    //null check on json
                     if (json == null || json.isEmpty() || json.getJsonObject("hits") == null
                             || json.getJsonObject("hits").getJsonArray("hits") == null) {
                         return Pair.of(emptyList(), 0);
                     }
-
+                    //total elements count found by elasticsearch query
                     int totalElementsCount = json
                             .getJsonObject("hits")
                             .getJsonObject("total")
                             .getInteger("value");
 
+                    //list of item id's returned by a query restricted to a specific size and page number
                     List<Long> itemIds = json
                             .getJsonObject("hits")
                             .getJsonArray("hits")

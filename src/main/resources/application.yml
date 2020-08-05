@@ -13,8 +13,11 @@ quarkus:
 #locale
 default-locale: pl-PL
 
+#custom properties
 com:
   example:
     default-locale: pl
     elasticsearch-host: localhost
     elasticsearch-port: 9200
+    redis-host: localhost
+    redis-port: 6380

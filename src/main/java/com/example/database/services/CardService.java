@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -33,17 +34,23 @@ public class CardService {
     }
 
     public Uni<CardModel> getCard(String id) {
-        return cardRepository.getCardList(id).onItem().apply(products ->
-            getCardProducts(products).onItem().apply(map -> new CardModel(map)).await().indefinitely());
+        return cardRepository.getCardList(id).onItem().produceUni(products ->
+            getCardProducts(products).onItem().apply(CardModel::new));
     }
 
     public Uni<CardModel> addProductToCard(Product product, String id) {
         return Uni.combine().all().unis(getCard(id), itemService.getItemById(product.getItemId()))
                 .combinedWith((cardModel, itemModel) -> {
-                    cardModel.addProductToCard(itemModel, product.getAmount());
-                    cardRepository.saveCard(id, CardConverter.convertToProductList(cardModel));
+                    cardModel.addProduct(itemModel, product.getAmount());
                     return cardModel;
-        });
+        }).onItem().produceUni(card -> {
+                    cardRepository.saveCard(id, CardConverter.convertToProductList(card));
+                    return Uni.createFrom().item(card);
+                });
+    }
+
+    public void flushCard(String id) {
+        cardRepository.saveCard(id, emptyList());
     }
 
     public AddressModel getAddressModel(Long id) {

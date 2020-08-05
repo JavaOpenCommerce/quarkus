@@ -9,5 +9,5 @@ public interface CardRepository {
 
     Uni<List<Product>> getCardList(String id);
 
-    void saveCard(String id, List<Product> products);
+    Uni<List<Product>> saveCard(String id, List<Product> products);
 }

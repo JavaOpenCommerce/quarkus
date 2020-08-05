@@ -38,6 +38,10 @@ public class CardDtoService {
                         .convertToDto(cardModel, langResolver.getLanguage(), langResolver.getDefault()));
     }
 
+    public void flushCard(String id) {
+        cardService.flushCard(id);
+    }
+
     public List<ItemDto> getShippingMethods() {
         //todo
         return null;

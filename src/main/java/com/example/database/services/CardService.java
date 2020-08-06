@@ -38,14 +38,39 @@ public class CardService {
             getCardProducts(products).onItem().apply(CardModel::new));
     }
 
-    public Uni<CardModel> addProductToCard(Product product, String id) {
+    public Uni<String> addProductWithAmount(Product product, String id) {
         return Uni.combine().all().unis(getCard(id), itemService.getItemById(product.getItemId()))
                 .combinedWith((cardModel, itemModel) -> {
-                    cardModel.addProduct(itemModel, product.getAmount());
-                    return cardModel;
-        }).onItem().produceUni(card -> {
-                    cardRepository.saveCard(id, CardConverter.convertToProductList(card));
-                    return Uni.createFrom().item(card);
+                    String result = cardModel.addProduct(itemModel, product.getAmount());
+                    cardRepository.saveCard(id, CardConverter.convertToProductList(cardModel));
+                    return result;
+                });
+    }
+    
+    public Uni<String> increaseProductAmount(Long itemId, String id) {
+        return Uni.combine().all().unis(getCard(id), itemService.getItemById(itemId))
+                .combinedWith((cardModel, itemModel) -> {
+                    String result = cardModel.increaseProductAmount(itemModel);
+                    cardRepository.saveCard(id, CardConverter.convertToProductList(cardModel));
+                    return result;
+                });
+    }
+
+    public Uni<String> decreaseProductAmount(Long itemId, String id) {
+        return Uni.combine().all().unis(getCard(id), itemService.getItemById(itemId))
+                .combinedWith((cardModel, itemModel) -> {
+                    String result = cardModel.decreaseProductAmount(itemModel);
+                    cardRepository.saveCard(id, CardConverter.convertToProductList(cardModel));
+                    return result;
+                });
+    }
+
+    public Uni<String> removeProduct(Long itemId, String id) {
+        return Uni.combine().all().unis(getCard(id), itemService.getItemById(itemId))
+                .combinedWith((cardModel, itemModel) -> {
+                    String result = cardModel.removeProduct(itemModel);
+                    cardRepository.saveCard(id, CardConverter.convertToProductList(cardModel));
+                    return result;
                 });
     }
 

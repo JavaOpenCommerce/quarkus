@@ -22,20 +22,28 @@ public class CardDtoService {
         this.langResolver = langResolver;
     }
 
-    public Uni<CardDto> addProductToCard(Product product, String id) {
-        return cardService
-                .addProductToCard(product, id)
-                .onItem()
-                .apply(cardModel -> CardConverter
-                        .convertToDto(cardModel, langResolver.getLanguage(), langResolver.getDefault()));
-    }
-
     public Uni<CardDto> getCard(String id) {
         return cardService
                 .getCard(id)
                 .onItem()
                 .apply(cardModel -> CardConverter
                         .convertToDto(cardModel, langResolver.getLanguage(), langResolver.getDefault()));
+    }
+
+    public Uni<String> addProductWithAmount(Product product, String id) {
+        return cardService.addProductWithAmount(product, id);
+    }
+
+    public Uni<String> increaseProductAmount(Long itemId, String id) {
+        return cardService.increaseProductAmount(itemId, id);
+    }
+
+    public Uni<String> removeProduct(Long itemId, String id) {
+        return cardService.removeProduct(itemId, id);
+    }
+
+    public Uni<String> decreaseProductAmount(Long itemId, String id) {
+        return cardService.decreaseProductAmount(itemId, id);
     }
 
     public void flushCard(String id) {

@@ -52,7 +52,16 @@ public class StoreService {
             itemService
                     .getItemsListByIdList(results.getLeft())
                     .onItem()
-                    .apply(items -> getItemModelPage(request.getPageNum(), request.getPageSize(), results.getRight(), items)));
+                    .apply(items -> {
+                        List<ItemModel> filteredList = items.stream()
+                                .filter(i -> validCategory(i.getCategory()))
+                                .collect(toList());
+
+                        //list size difference after filtering out Shipping methods
+                        int difference = items.size() - filteredList.size();
+                        return getItemModelPage(request.getPageNum(), request.getPageSize(),
+                                        results.getRight() - difference, filteredList);
+                    }));
     }
 
     public Uni<List<CategoryModel>> getAllCategories() {
@@ -112,6 +121,12 @@ public class StoreService {
                 .totalElementsCount(totalCount)
                 .items(items)
                 .build();
+    }
+
+    private boolean validCategory(List<CategoryModel> categories) {
+        return categories.stream()
+                .flatMap(category -> category.getDetails().stream())
+                .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));
     }
 }
 

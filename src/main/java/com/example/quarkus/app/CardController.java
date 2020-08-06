@@ -2,6 +2,7 @@ package com.example.quarkus.app;
 
 import com.example.database.entity.Product;
 import com.example.rest.dtos.CardDto;
+import com.example.rest.dtos.ItemDto;
 import com.example.rest.services.CardDtoService;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.Cookie;
@@ -11,6 +12,7 @@ import lombok.extern.jbosslog.JBossLog;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.utils.MessagesStore.OK;
@@ -93,6 +95,13 @@ public class CardController {
             log.info("Card flushed");
         }
         return "{\"response\":\"" + OK + "\"}";
+    }
+
+    @GET
+    @Path("/shipping")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Uni<List<ItemDto>> getShippingMethods() {
+        return cardDtoService.getShippingMethods();
     }
 
     private boolean cookieCheck() {

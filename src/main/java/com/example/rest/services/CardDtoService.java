@@ -6,10 +6,13 @@ import com.example.rest.dtos.CardDto;
 import com.example.rest.dtos.ItemDto;
 import com.example.utils.LanguageResolver;
 import com.example.utils.converters.CardConverter;
+import com.example.utils.converters.ItemConverter;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @ApplicationScoped
 public class CardDtoService {
@@ -50,11 +53,13 @@ public class CardDtoService {
         cardService.flushCard(id);
     }
 
-    public List<ItemDto> getShippingMethods() {
-        //todo
-        return null;
-//        cardService.getShippingMethods().stream()
-//                .map(i -> ItemConverter.convertToDto(i, langResolver.getLanguage(), langResolver.getDefault()))
-//                .collect(Collectors.toList());
+    public Uni<List<ItemDto>> getShippingMethods() {
+        return cardService
+                .getShippingMethods()
+                .onItem()
+                .apply(items -> items
+                        .stream()
+                        .map(i -> ItemConverter.convertToDto(i, langResolver.getLanguage(), langResolver.getDefault()))
+                        .collect(toList()));
     }
 }

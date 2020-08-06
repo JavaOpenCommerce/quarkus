@@ -1,6 +1,5 @@
 package com.example.elasticsearch;
 
-import com.example.database.services.StoreService;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClientOptions;
@@ -20,25 +19,22 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 public class SearchService {
 
     private WebClient client;
-    private final StoreService service;
 
 
-    public SearchService(Vertx vertx, ElasticAddress address, StoreService service) {
-        this.service = service;
+    public SearchService(Vertx vertx, ElasticAddress address) {
         this.client = WebClient.create(vertx, new WebClientOptions()
                 .setDefaultPort(address.getPort())
                 .setDefaultHost(address.getHost()));
     }
 
     public Uni<JsonObject> searchItemsBySearchRequest(SearchRequest request) {
-
         SearchSourceBuilder ssb = new SearchSourceBuilder();
 
         String query = ssb.query(QueryBuilders.boolQuery()
-                .must(request.getCategoryId() == null || request.getCategoryId() == 0 ?
+                .must(request.getCategoryId() == null || request.getCategoryId() == 0L ?
                         matchAllQuery() :
                         matchQuery("categoryIds", request.getCategoryId()))
-                .must(request.getProducerId() == null || request.getProducerId() == 0 ?
+                .must(request.getProducerId() == null || request.getProducerId() == 0L ?
                         matchAllQuery() :
                         matchQuery("producerId", request.getProducerId()))
                 .must(request.getSearchQuery() == null || request.getSearchQuery().isEmpty() ?

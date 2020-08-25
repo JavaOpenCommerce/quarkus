@@ -12,6 +12,7 @@ import com.example.elasticsearch.SearchService;
 import com.example.utils.converters.AddressConverter;
 import com.example.utils.converters.CardConverter;
 import io.smallrye.mutiny.Uni;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -105,24 +106,17 @@ public class CardService {
     }
 
     private Uni<List<Long>> getFilteredResults(SearchRequest request) {
-        return searchService
-                .searchItemsBySearchRequest(request).onItem().apply(json -> {
-
-                    //null check on json
-                    if (json == null || json.isEmpty() || json.getJsonObject("hits") == null
-                            || json.getJsonObject("hits").getJsonArray("hits") == null) {
-                        return emptyList();
-                    }
-
-                    return json
-                            .getJsonObject("hits")
-                            .getJsonArray("hits")
+        return searchService.searchItemsBySearchRequest(request).onItem().apply(json ->
+                    ofNullable(json)
+                            .map(j -> j.getJsonObject("hits"))
+                            .map(hits -> hits.getJsonArray("hits"))
+                            .orElse(new JsonArray())
                             .stream()
                             .filter(o -> o instanceof JsonObject)
                             .map(JsonObject.class::cast)
                             .map(o -> parseLong(o.getString("_id")))
-                            .collect(toList());
-                });
+                            .collect(toList())
+                );
     }
 
     private Uni<Map<Long, ProductModel>> getCardProducts(List<Product> products) {

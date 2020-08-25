@@ -6,10 +6,13 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.ext.web.client.WebClient;
 import lombok.extern.jbosslog.JBossLog;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import javax.enterprise.context.ApplicationScoped;
+
+import java.util.function.Supplier;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
@@ -31,19 +34,18 @@ public class SearchService {
         SearchSourceBuilder ssb = new SearchSourceBuilder();
 
         String query = ssb.query(QueryBuilders.boolQuery()
-                .must(request.getCategoryId() == null || request.getCategoryId() == 0L ?
-                        matchAllQuery() :
-                        matchQuery("categoryIds", request.getCategoryId()))
-                .must(request.getProducerId() == null || request.getProducerId() == 0L ?
-                        matchAllQuery() :
-                        matchQuery("producerId", request.getProducerId()))
-                .must(request.getSearchQuery() == null || request.getSearchQuery().isEmpty() ?
-                        matchAllQuery() :
-                        matchQuery("details.name", request.getSearchQuery())))
+                .must(ifTrueOrElse(isEmpty(request),
+                        () -> matchAllQuery(),
+                        () -> matchQuery("categoryIds", request.getCategoryId())))
+                .must(ifTrueOrElse(isEmpty(request),
+                        () -> matchAllQuery(),
+                        () -> matchQuery("producerId", request.getProducerId())))
+                .must(ifTrueOrElse(request.getSearchQuery() == null || request.getSearchQuery().isEmpty(),
+                        () -> matchAllQuery(),
+                        () -> matchQuery("details.name", request.getSearchQuery()))))
                 .from(request.getPageSize() * request.getPageNum())
                 .size(request.getPageSize())
                 .toString();
-
         log.info(query);
 
         return client.get("/items/_search?filter_path=hits.hits._id,hits.total.value")
@@ -58,5 +60,15 @@ public class SearchService {
                                 .put("message", resp.bodyAsString());
                     }
                 });
+    }
+
+    private QueryBuilder ifTrueOrElse(Boolean matchAll,
+                                      Supplier<QueryBuilder> all,
+                                      Supplier<QueryBuilder> other) {
+        return matchAll ? all.get() : other.get();
+    }
+
+    private boolean isEmpty(SearchRequest request) {
+        return request.getCategoryId() == null || request.getCategoryId() == 0L;
     }
 }

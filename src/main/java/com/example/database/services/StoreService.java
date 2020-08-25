@@ -54,7 +54,7 @@ public class StoreService {
                     .onItem()
                     .apply(items -> {
                         List<ItemModel> filteredList = items.stream()
-                                .filter(i -> validCategory(i.getCategory()))
+                                .filter(i -> isValidCategory(i.getCategory()))
                                 .collect(toList());
 
                         //list size difference after filtering out Shipping methods
@@ -69,14 +69,14 @@ public class StoreService {
             categories.stream()
                     .filter(cat -> cat.getDetails().stream()
                             .allMatch(detail -> !"shipping".equalsIgnoreCase(detail.getName())))
-                    .map(cat -> CategoryConverter.convertToModel(cat))
+                    .map(CategoryConverter::convertToModel)
                     .collect(toList()));
     }
 
     public Uni<List<ProducerModel>> getAllProducers() {
         return producerRepository.getAll().onItem().apply(producers ->
                 producers.stream()
-                        .map(prod -> ProducerConverter.convertToModel(prod))
+                        .map(ProducerConverter::convertToModel)
                         .collect(toList()));
     }
 
@@ -123,7 +123,7 @@ public class StoreService {
                 .build();
     }
 
-    private boolean validCategory(List<CategoryModel> categories) {
+    private boolean isValidCategory(List<CategoryModel> categories) {
         return categories.stream()
                 .flatMap(category -> category.getDetails().stream())
                 .allMatch(details -> !"shipping".equalsIgnoreCase(details.getName()));

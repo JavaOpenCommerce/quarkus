@@ -77,7 +77,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Uni<List<ItemDetails>> getItemDetailsListByIdList(List<Long> ids) {
         return client.preparedQuery(format("%s WHERE item_id = ANY ($1)", SELECT_DETAILS_BASE),
-                                        Tuple.of(ids.toArray(new Long[ids.size()])))
+                Tuple.of(ids.toArray(new Long[ids.size()])))
                 .onItem().apply(this::getItemDetails);
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ItemQuantityRepository {
 
-    List<ItemQuantity> getItemQuantitiesByOrderId(Long id);
+    Uni<List<ItemQuantity>> getItemQuantitiesByOrderId(Long id);
 
     Uni<ItemQuantity> saveItemQuantity(ItemQuantity itemQuantity);
 }

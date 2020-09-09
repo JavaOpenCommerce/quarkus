@@ -215,5 +215,76 @@ alter sequence item_id_seq
     restart 20;
 alter sequence item_id_seq owner to testuser;
 
+alter sequence itemdetails_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence itemdetails_id_seq owner to testuser;
+
+alter sequence itemquantity_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence itemquantity_id_seq to testuser;
+
+alter sequence category_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence category_id_seq owner to testuser;
+
+alter sequence categorydetails_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence categorydetails_id_seq owner to testuser;
+
+alter sequence image_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence image_id_seq owner to testuser;
+
+alter sequence orderdetails_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence orderdetails_id_seq owner to testuser;
+
+alter sequence address_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence address_id_seq owner to testuser;
+
+alter sequence producer_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence producer_id_seq owner to testuser;
+
+alter sequence producerdetails_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence producerdetails_id_seq owner to testuser;
+
+alter sequence userentity_id_seq
+    increment by 1
+    minvalue 20
+    start 20
+    restart 20;
+alter sequence userentity_id_seq owner to testuser;
+
+
 
 

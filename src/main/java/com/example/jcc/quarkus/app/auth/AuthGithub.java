@@ -14,6 +14,7 @@ import io.vertx.mutiny.ext.web.client.WebClient;
 import io.vertx.mutiny.ext.web.codec.BodyCodec;
 import lombok.extern.jbosslog.JBossLog;
 import org.apache.http.entity.ContentType;
+import org.yaml.snakeyaml.util.UriEncoder;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
@@ -36,6 +38,8 @@ public class AuthGithub {
     private final AuthConfig cfg;
     private final SessionProducer sessionStore;
     private final WebClient client;
+    private final String googleAuthUrl = "https://oauth2.googleapis.com/token";
+    private final String googleRedirectUrl = "http://localhost:8080/oauth/authorize/google";
 
     public AuthGithub(SessionProducer sess, AuthConfig config, Vertx mVertx) {
         cfg = config;
@@ -82,61 +86,62 @@ public class AuthGithub {
     @Route(path = "/oauth/authorize/google", methods = {HttpMethod.GET})
     public void authorizeGoogle(RoutingContext rc) throws IOException, InterruptedException {
         sessionStore.getSessionHandler().handle(rc);
-        String sessionId = ofNullable(rc.session()).map(Session::id).orElse("null");
-        final Optional<Session> session = ofNullable(rc.session());
-        if (session.isEmpty()) {
-            sendUnauthorized(rc, "You are not authorized to perform such requests.");
+        if (!validateAuthorizedUser(rc)) {
+            log.debug("Authentication failed, user state token is invalid or missing session");
+            return;
         }
-        ofNullable(rc.queryParam(STATE)).orElse(emptyList()).stream().findFirst()
-                .ifPresentOrElse(state -> {
-                    var sessionState = rc.session().data().get(STATE);
-                    rc.session().data().remove(STATE);
-                    if (!state.equals(sessionState)) {
-                        sendUnauthorized(rc, "Invalid state token");
-                        return;
-                    }
-                }, () -> {
-                    sendUnauthorized(rc,"Parameter 'state' is mandatory.");
-                    return;
-                }
-        );
+        String sessionId = ofNullable(rc.session()).map(Session::id).orElse("null");
         log.infof("Got GET request with: %s, incoming session: %s", rc.user().principal(), sessionId);
         final String code = ofNullable(rc.queryParam("code")).orElse(emptyList()).stream().findFirst().orElse("");
 
-        String sb = "code=" + URLEncoder.encode(code, UTF_8) +
-                "&client_id=" + URLEncoder.encode(cfg.clientId(), UTF_8) +
-                "&client_secret=" + URLEncoder.encode(cfg.clientSecret(), UTF_8) +
-                "&redirect_uri=" + "http://localhost:8080/oauth/authorize/google" +
-                "&grant_type=authorization_code";
+        String params = "code=" + code +
+                "&grant_type=authorization_code" +
+                "&client_id=" + cfg.clientId() +
+                "&client_secret=" + cfg.clientSecret() +
+                "&redirect_uri=" + googleRedirectUrl;
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://oauth2.googleapis.com/token"))
+                .uri(URI.create(googleAuthUrl))
                 .timeout(Duration.ofSeconds(5))
                 .header("Content-Type", ContentType.APPLICATION_FORM_URLENCODED.getMimeType())
-                .POST(HttpRequest.BodyPublishers.ofString(sb))
+                .POST(HttpRequest.BodyPublishers.ofString(params))
                 .build();
 
         final String jsonResponse = HttpClient.newHttpClient()
                 .sendAsync(request, java.net.http.HttpResponse.BodyHandlers.ofString())
                 .thenApply(java.net.http.HttpResponse::body)
                 .join();
-        final JsonObject resp = new JsonObject(jsonResponse);
 
-        final GoogleAuthResponse authResponse = GoogleAuthResponse
-                .builder()
-                .access_token(resp.getString("access_token"))
-                .expires_in(resp.getInteger("expires_in"))
-                .scope(resp.getString("scope"))
-                .token_type(resp.getString("token_type"))
-                .id_token(resp.getString("id_token"))
-                .error(resp.getString("error"))
-                .message(resp.getString("message"))
-                .build();
+        final GoogleAuthResponse authResponse = GoogleAuthResponse.fromJson(jsonResponse);
         if (authResponse.isError()) {
             log.errorf("Authentication failed with message: %s : %s", authResponse.getError(), authResponse.getMessage());
             return;
         }
         log.infof("Logged in user %s", authResponse.toString());
+//eyJhbGciOiJSUzI1NiIsImtpZCI6IjZiYzYzZTlmMThkNTYxYjM0ZjU2NjhmODhhZTI3ZDQ4ODc2ZDgwNzMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI3MjI2NzEyNTg5NDctZGtwOGhhOWplcWszN2I1ZmhzZHFsNGp0MW51bm5tbWguYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI3MjI2NzEyNTg5NDctZGtwOGhhOWplcWszN2I1ZmhzZHFsNGp0MW51bm5tbWguYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDE3Njk3NzE2MDg3MzMwNzY1MDIiLCJlbWFpbCI6ImF1Z3VzdHlud2lsa0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IjAxNG9LanVaQmktX3pvTXFiS3BiSXciLCJub25jZSI6IjAzOTQ4NTIzMTkwNDg1MjQ5MDM1OCIsImlhdCI6MTU5NzY4MTE2NSwiZXhwIjoxNTk3Njg0NzY1fQ.Wz0nmGzXv5Va_KfJ_xc0vYyRYjHvl_ZWzl3k9rFh1QmYz1PSJtRrCPy5M303pQr2dUGR_HUz01xwbbkG3gow6V1kRKM546W9oT_B4py44HjP5btpSs9MuS3OFLh-hCbXB-wg9eplm66ujdqmz_uX-xDMGrwtFbNYJpe7Mwgaj0U7DzQtMkuyIa0ABPsQBrX_Pq2pb49mGPJw-4y4OEvoKAwm83V74vYf4p044RN002GXz6coLgiD6VC03SBzkvLGHDY2cOxzFvDRl_rck2HU79RZyV23NLT_JvJcLCDqP7j_efwXxELueeNunZetBTzJs5lx5dLppkl_7PtL7-fjGQ
+    }
 
+    private boolean validateAuthorizedUser(RoutingContext rc) {
+        final Optional<Session> session = ofNullable(rc.session());
+        if (session.isEmpty()) {
+            sendUnauthorized(rc, "You are not authorized to perform such requests.");
+            return false;
+        }
+        AtomicBoolean isValid = new AtomicBoolean(true);
+        ofNullable(rc.queryParam(STATE)).orElse(emptyList()).stream().findFirst()
+                .ifPresentOrElse(state -> {
+                    var sessionState = rc.session().data().get(STATE);
+                    rc.session().data().remove(STATE);
+                    if (!state.equals(sessionState)) {
+                        sendUnauthorized(rc, "Invalid state token");
+                        isValid.set(false);
+                    }
+                }, () -> {
+                    sendUnauthorized(rc,"Parameter 'state' is mandatory.");
+                    isValid.set(false);
+                }
+        );
+        return isValid.get();
     }
 
     private Throwable handleError(Throwable err) {

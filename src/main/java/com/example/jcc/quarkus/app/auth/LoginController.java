@@ -61,7 +61,7 @@ public class LoginController {
                 .putHeader(HttpHeaders.LOCATION, "https://accounts.google.com/o/oauth2/v2/auth?" +
                         "response_type=code&" +
                         "client_id=" + clientId + "&" +
-                        "scope=email openid&" +
+                        "scope=openid profile email&" +
                         "redirect_uri=http://localhost:8080/oauth/authorize/google&" +
                         "state=" + state + "&" +
                         "nonce=039485231904852490358")

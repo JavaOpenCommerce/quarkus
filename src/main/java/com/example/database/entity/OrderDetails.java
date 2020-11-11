@@ -1,13 +1,8 @@
 package com.example.database.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static com.example.database.entity.OrderStatus.NEW;
 import static com.example.database.entity.PaymentMethod.MONEY_TRANSFER;
@@ -34,6 +29,4 @@ public class OrderDetails {
     private OrderStatus orderStatus = NEW;
 
     private Long userEntityId;
-
-    private List<ItemQuantity> products;
 }

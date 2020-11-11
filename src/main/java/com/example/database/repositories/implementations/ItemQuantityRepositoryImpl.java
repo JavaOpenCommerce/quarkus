@@ -5,12 +5,15 @@ import com.example.database.repositories.interfaces.ItemQuantityRepository;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.pgclient.PgPool;
 import io.vertx.mutiny.sqlclient.Row;
+import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 @ApplicationScoped
 public class ItemQuantityRepositoryImpl implements ItemQuantityRepository {
@@ -22,9 +25,9 @@ public class ItemQuantityRepositoryImpl implements ItemQuantityRepository {
     }
 
     @Override
-    public List<ItemQuantity> getItemQuantitiesByOrderId(Long id) {
-        //todo
-        return emptyList();
+    public Uni<List<ItemQuantity>> getItemQuantitiesByOrderId(Long id) {
+        return client.preparedQuery("SELECT * FROM ITEMQUANTITY WHERE order_id = $1", Tuple.of(id))
+                .onItem().apply(this::rowSetToItemQuantityList);
     }
 
     @Override
@@ -55,5 +58,19 @@ public class ItemQuantityRepositoryImpl implements ItemQuantityRepository {
                 .itemId(row.getLong("item_id"))
                 .orderId(row.getLong("order_id"))
                 .build();
+    }
+
+    private List<ItemQuantity> rowSetToItemQuantityList(RowSet<Row> rs) {
+        if (isRowSetEmpty(rs)) {
+            return emptyList();
+        }
+
+        return stream(rs.spliterator(), false)
+                .map(this::rowToItemQuantity)
+                .collect(toList());
+    }
+
+    private boolean isRowSetEmpty(RowSet<Row> rs) {
+        return rs == null || !rs.iterator().hasNext();
     }
 }

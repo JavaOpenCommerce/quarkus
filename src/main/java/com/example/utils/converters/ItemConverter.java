@@ -24,11 +24,11 @@ public interface ItemConverter {
     static ItemModel convertToModel(Item item, List<ItemDetails> itemDetails, List<Category> categories, Producer producer) {
 
         List<ItemDetailModel> details = itemDetails.stream()
-                .map(d -> ItemDetailConverter.convertToModel(d))
+                .map(ItemDetailConverter::convertToModel)
                 .collect(Collectors.toList());
 
         List<CategoryModel> categoryModels = categories.stream()
-                .map(cat -> CategoryConverter.convertToModel(cat))
+                .map(CategoryConverter::convertToModel)
                 .collect(Collectors.toList());
 
         return ItemModel.builder()

@@ -11,7 +11,6 @@ import io.vertx.mutiny.sqlclient.RowSet;
 import io.vertx.mutiny.sqlclient.Tuple;
 
 import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.database.entity.OrderStatus.NEW;
@@ -20,7 +19,10 @@ import static com.example.database.entity.PaymentMethod.valueOf;
 import static com.example.database.entity.PaymentStatus.BEFORE_PAYMENT;
 import static java.time.LocalDate.now;
 import static java.util.Collections.emptyList;
+import static java.util.Objects.isNull;
 import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 @ApplicationScoped
 public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
@@ -69,20 +71,18 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
 
     //--Helpers-----------------------------------------------------------------------------------------------------
 
-    private boolean isRowSetEmpty(io.vertx.mutiny.sqlclient.RowSet<Row> rs) {
-        return rs == null || !rs.iterator().hasNext();
+    private boolean isRowSetEmpty(RowSet<Row> rs) {
+        return isNull(rs) || !rs.iterator().hasNext();
     }
 
     private List<OrderDetails> getOrderDetailsList(RowSet<Row> rs) {
-        if (rs == null) {
+        if (isRowSetEmpty(rs)) {
             return emptyList();
         }
-        List<OrderDetails> orderDetails = new ArrayList<>();
 
-        rs.iterator()
-                .forEachRemaining(r -> orderDetails.add(rowToOrderDetails(r)));
-
-        return orderDetails;
+        return stream(rs.spliterator(), false)
+                .map(this::rowToOrderDetails)
+                .collect(toList());
     }
 
     private OrderDetails rowToOrderDetails(Row row) {
@@ -100,7 +100,6 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
                 .orderStatus(of(OrderStatus.valueOf(row.getString("orderstatus")))
                         .orElse(NEW))
                 .shippingAddressId(row.getLong("address_id"))
-                .products(emptyList())
                 .userEntityId(row.getLong("userentity_id"))
                 .build();
     }

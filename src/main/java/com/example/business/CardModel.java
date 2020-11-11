@@ -1,6 +1,5 @@
 package com.example.business;
 
-import com.example.business.models.AddressModel;
 import com.example.business.models.ItemModel;
 import com.example.business.models.ProductModel;
 import lombok.EqualsAndHashCode;
@@ -20,8 +19,6 @@ import static java.util.Objects.nonNull;
 public final class CardModel {
 
     private final Map<Long, ProductModel> products;
-    private AddressModel deliveryAddress;
-    private Payment payment;
     private Value cardValueNett = Value.of(ZERO);
     private Value cardValueGross = Value.of(ZERO);
 

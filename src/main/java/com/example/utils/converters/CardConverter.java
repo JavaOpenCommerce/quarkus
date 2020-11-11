@@ -22,7 +22,6 @@ public interface CardConverter {
         return CardDto.builder()
                 .cardValueGross(cardModel.getCardValueGross().asDecimal())
                 .cardValueNett(cardModel.getCardValueNett().asDecimal())
-                .deliveryAddress(null)
                 .products(productDtos)
                 .build();
     }

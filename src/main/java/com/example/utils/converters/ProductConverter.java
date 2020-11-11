@@ -1,6 +1,7 @@
 package com.example.utils.converters;
 
 import com.example.business.models.ProductModel;
+import com.example.database.entity.ItemQuantity;
 import com.example.rest.dtos.ProductDto;
 
 public interface ProductConverter {
@@ -12,5 +13,14 @@ public interface ProductConverter {
                 .valueGross(product.getValueGross().asDecimal())
                 .valueNett(product.getValueNett().asDecimal())
                 .build();
+    }
+
+    static ItemQuantity convertToItemQuantity(ProductModel product, Long orderId) {
+        return ItemQuantity.builder()
+                .itemId(product.getItemModel().getId())
+                .amount(product.getAmount().asInteger())
+                .orderId(orderId)
+                .build();
+
     }
 }

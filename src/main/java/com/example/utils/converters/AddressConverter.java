@@ -20,7 +20,7 @@ public interface AddressConverter {
     static Address convertToEntity(AddressModel addressModel) {
         return Address.builder()
                 .id(addressModel.getId())
-                .userId(addressModel.getUser_id())
+                .userId(addressModel.getUserId())
                 .street(addressModel.getStreet())
                 .city(addressModel.getCity())
                 .local(addressModel.getLocal())

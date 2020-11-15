@@ -23,8 +23,8 @@ public final class CardModel {
     private Value cardValueGross = Value.of(ZERO);
 
 
-    public CardModel(Map<Long, ProductModel> products) {
-        this.products = new HashMap<>(products);
+    public CardModel(Map<Long, ProductModel> productsMap) {
+        this.products = new HashMap<>(productsMap);
         calculateCardValue();
     }
 

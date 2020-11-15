@@ -52,16 +52,19 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
 
     @Override
     public Uni<OrderDetails> saveOrder(OrderDetails orderDetails) {
-       return client.preparedQuery("INSERT INTO ORDERDETAILS (creationdate, orderstatus, paymentmethod, " +
-                                        "paymentstatus, address_id, userentity_id) " +
-                                        "VALUES($1, $2, $3, $4, $5, $6)", Tuple.of(
+        Object[] args = {
                 now(),
                 orderDetails.getOrderStatus().toString(),
                 orderDetails.getPaymentMethod().toString(),
                 orderDetails.getPaymentStatus().toString(),
                 orderDetails.getShippingAddressId(),
-                orderDetails.getUserEntityId()
-        )).onItem().apply(rs -> {
+                orderDetails.getUserEntityId(),
+                orderDetails.getProductsJson()
+        };
+        return client.preparedQuery("INSERT INTO ORDERDETAILS (creationdate, orderstatus, paymentmethod, " +
+                                        "paymentstatus, address_id, userentity_id, productsjson) " +
+                                        "VALUES($1, $2, $3, $4, $5, $6, $7)", Tuple.of(args))
+        .onItem().apply(rs -> {
             if (isRowSetEmpty(rs)) {
                 return OrderDetails.builder().build();
             }
@@ -101,6 +104,7 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
                         .orElse(NEW))
                 .shippingAddressId(row.getLong("address_id"))
                 .userEntityId(row.getLong("userentity_id"))
+                .productsJson(row.getString("productsjson"))
                 .build();
     }
 }

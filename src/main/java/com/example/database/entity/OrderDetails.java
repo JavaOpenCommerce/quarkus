@@ -29,4 +29,6 @@ public class OrderDetails {
     private OrderStatus orderStatus = NEW;
 
     private Long userEntityId;
+
+    private String productsJson;
 }

@@ -4,11 +4,13 @@ import com.example.business.models.OrderDetailsModel;
 import com.example.business.models.ProductModel;
 import com.example.database.entity.*;
 
-import java.util.Map;
+import java.util.List;
+
+import static com.example.utils.converters.JsonConverter.convertToJson;
 
 public interface OrderDetailsConverter {
 
-    static OrderDetailsModel convertToModel(OrderDetails orderDetails, Map<Long, ProductModel> products, Address address, UserEntity userEntity) {
+    static OrderDetailsModel convertToModel(OrderDetails orderDetails, List<ProductModel> products, Address address, UserEntity userEntity) {
 
         return OrderDetailsModel.builder()
                 .id(orderDetails.getId())
@@ -32,6 +34,7 @@ public interface OrderDetailsConverter {
                 .paymentMethod(PaymentMethod.valueOf(orderDetailsModel.getPaymentMethod()))
                 .paymentStatus(PaymentStatus.valueOf(orderDetailsModel.getPaymentMethod()))
                 .userEntityId(orderDetailsModel.getUser().getId())
+                .productsJson(convertToJson(orderDetailsModel.getProducts()))
                 .build();
     }
 }

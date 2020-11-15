@@ -37,7 +37,7 @@ public class ProducerRepositoryImpl implements ProducerRepository {
                                         "INNER JOIN ProducerDetails pd ON pd.producer_id = p.id " +
                                         "INNER JOIN Item i ON i.producer_id = p.id " +
                                         "WHERE i.id = $1", Tuple.of(id))
-                .onItem().apply(rs -> buildProducer(rs));
+                .onItem().apply(this::buildProducer);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ProducerRepositoryImpl implements ProducerRepository {
         return client.preparedQuery("SELECT * FROM Producer p " +
                                         "INNER JOIN Image img ON p.image_id = img.id " +
                                         "INNER JOIN ProducerDetails pd ON pd.producer_id = p.id ")
-                .onItem().apply(rs -> rowToProducerList(rs));
+                .onItem().apply(this::rowToProducerList);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ProducerRepositoryImpl implements ProducerRepository {
                                         "INNER JOIN Item i ON i.producer_id = p.id " +
                                         "WHERE i.id = ANY ($1)",
                                         Tuple.of(ids.toArray(new Long[ids.size()])))
-                .onItem().apply(rs -> rowToProducerList(rs));
+                .onItem().apply(this::rowToProducerList);
     }
 
     private List<Producer> rowToProducerList(RowSet<Row> rs) {
@@ -83,7 +83,6 @@ public class ProducerRepositoryImpl implements ProducerRepository {
 
     private Producer buildProducer(RowSet<Row> rs) {
         if (rs == null || rs.next() == null) {
-            rs.forEach(System.out::println);
             return Producer.builder().build();
         }
 

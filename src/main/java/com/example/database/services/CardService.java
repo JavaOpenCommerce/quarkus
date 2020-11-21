@@ -1,7 +1,7 @@
 package com.example.database.services;
 
-import com.example.business.CardModel;
 import com.example.business.models.AddressModel;
+import com.example.business.models.CardModel;
 import com.example.business.models.ItemModel;
 import com.example.business.models.ProductModel;
 import com.example.database.entity.Address;
@@ -42,7 +42,7 @@ public class CardService {
 
     public Uni<CardModel> getCard(String id) {
         return cardRepository.getCardList(id).onItem().produceUni(products ->
-            getCardProducts(products).onItem().apply(CardModel::new));
+            getCardProducts(products).onItem().apply(CardModel::getInstance));
     }
 
     public Uni<String> addProductWithAmount(CardProduct product, String id) {

@@ -16,9 +16,7 @@ import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static com.example.utils.converters.JsonConverter.convertToObject;
 import static io.smallrye.mutiny.Uni.combine;
@@ -44,7 +42,7 @@ public class OrderDetailsService {
     public Uni<OrderDetailsModel> getOrderDetailsById(Long id) {
         Uni<OrderDetails> orderDetailsUni = orderDetailsRepository.findOrderDetailsById(id);
 
-        Uni<List<ProductModel>> itemQuantityListUni = orderDetailsUni.onItem()
+        Uni<Map<Long, ProductModel>> itemQuantityListUni = orderDetailsUni.onItem()
                 .produceUni(od -> getProducts(od.getProductsJson()));
 
         Uni<Address> addressUni = orderDetailsUni.onItem()
@@ -64,7 +62,7 @@ public class OrderDetailsService {
                         OrderDetailsConverter.convertToEntity(od))
                 );
 
-        Uni<List<ProductModel>> productsMapUni = savedOrderDetails.onItem()
+        Uni<Map<Long, ProductModel>> productsMapUni = savedOrderDetails.onItem()
                 .produceUni(sod -> getProducts(sod.getProductsJson()));
 
         return combine().all().unis(
@@ -75,7 +73,7 @@ public class OrderDetailsService {
                 .combinedWith(OrderDetailsConverter::convertToModel);
     }
 
-    private Uni<List<ProductModel>> getProducts(String productsJson) {
+    private Uni<Map<Long, ProductModel>> getProducts(String productsJson) {
 
         List<CardProduct> cardProducts =
                 convertToObject(productsJson, new ArrayList<CardProduct>() {}.getClass().getGenericSuperclass());
@@ -83,7 +81,7 @@ public class OrderDetailsService {
         List<Long> ids = getProductIdList(cardProducts);
 
         return itemService.getItemsListByIdList(ids).onItem().apply(itemModels -> {
-            List<ProductModel> cardProductModels = new ArrayList<>();
+            Map<Long, ProductModel> cardProductsMap = new HashMap<>();
             for (ItemModel im : itemModels) {
                 int amount = cardProducts.stream()
                         .filter(Objects::nonNull)
@@ -91,9 +89,9 @@ public class OrderDetailsService {
                         .findFirst()
                         .orElse(CardProduct.builder().amount(1).build())
                         .getAmount();
-                cardProductModels.add(ProductModel.getProduct(im, amount));
+                cardProductsMap.put(im.getId(), ProductModel.getProduct(im, amount));
             }
-            return cardProductModels;
+            return cardProductsMap;
         });
     }
 

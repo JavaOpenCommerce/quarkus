@@ -1,6 +1,7 @@
 package com.example.utils.converters;
 
-import com.example.business.CardModel;
+
+import com.example.business.models.CardModel;
 import com.example.database.entity.CardProduct;
 import com.example.rest.dtos.CardDto;
 import com.example.rest.dtos.ProductDto;

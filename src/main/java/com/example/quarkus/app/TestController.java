@@ -1,6 +1,8 @@
 package com.example.quarkus.app;
 
-import com.example.database.entity.*;
+import com.example.database.entity.Image;
+import com.example.database.entity.Item;
+import com.example.database.entity.OrderDetails;
 import com.example.database.repositories.interfaces.ItemRepository;
 import com.example.database.repositories.interfaces.OrderDetailsRepository;
 import io.smallrye.mutiny.Uni;

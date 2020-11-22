@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'io.quarkus' version '1.9.0.Final' // the same version as in gradle.properties
+    id 'io.quarkus' version '1.9.2.Final' // the same version as in gradle.properties
     id 'io.freefair.lombok' //version '5.1.0'
 }
 dependencies {

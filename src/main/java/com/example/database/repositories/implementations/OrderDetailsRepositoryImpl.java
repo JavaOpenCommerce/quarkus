@@ -35,13 +35,15 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
 
     @Override
     public Uni<List<OrderDetails>> findOrderDetailsByUserId(Long id) {
-        return client.preparedQuery("SELECT * FROM ORDERDETAILS od WHERE od.userentity_id = $1", Tuple.of(id))
+        return this.client.preparedQuery("SELECT * FROM ORDERDETAILS od WHERE od.userentity_id = $1")
+                .execute(Tuple.of(id))
                 .onItem().apply(this::getOrderDetailsList);
     }
 
     @Override
     public Uni<OrderDetails> findOrderDetailsById(Long id) {
-        return client.preparedQuery("SELECT * FROM ORDERDETAILS od WHERE od.id = $1", Tuple.of(id))
+        return this.client.preparedQuery("SELECT * FROM ORDERDETAILS od WHERE od.id = $1")
+                .execute(Tuple.of(id))
                 .onItem().apply(rs -> {
                     if (isRowSetEmpty(rs)) {
                         return OrderDetails.builder().build();
@@ -61,15 +63,16 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
                 orderDetails.getUserEntityId(),
                 orderDetails.getProductsJson()
         };
-        return client.preparedQuery("INSERT INTO ORDERDETAILS (creationdate, orderstatus, paymentmethod, " +
+        return this.client.preparedQuery("INSERT INTO ORDERDETAILS (creationdate, orderstatus, paymentmethod, " +
                                         "paymentstatus, address_id, userentity_id, productsjson) " +
-                                        "VALUES($1, $2, $3, $4, $5, $6, $7)", Tuple.of(args))
-        .onItem().apply(rs -> {
-            if (isRowSetEmpty(rs)) {
-                return OrderDetails.builder().build();
-            }
-            return rowToOrderDetails(rs.iterator().next());
-        });
+                                        "VALUES($1, $2, $3, $4, $5, $6, $7)")
+                .execute(Tuple.of(args))
+                .onItem().apply(rs -> {
+                    if (isRowSetEmpty(rs)) {
+                        return OrderDetails.builder().build();
+                    }
+                    return rowToOrderDetails(rs.iterator().next());
+                });
     }
 
     //--Helpers-----------------------------------------------------------------------------------------------------

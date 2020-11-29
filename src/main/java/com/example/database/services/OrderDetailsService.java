@@ -43,13 +43,13 @@ public class OrderDetailsService {
         Uni<OrderDetails> orderDetailsUni = orderDetailsRepository.findOrderDetailsById(id);
 
         Uni<Map<Long, ProductModel>> itemQuantityListUni = orderDetailsUni.onItem()
-                .produceUni(od -> getProducts(od.getProductsJson()));
+                .transformToUni(od -> getProducts(od.getProductsJson()));
 
         Uni<Address> addressUni = orderDetailsUni.onItem()
-                .produceUni(od -> addressRepository.findById(od.getId()));
+                .transformToUni(od -> addressRepository.findById(od.getId()));
 
         Uni<UserEntity> userUni = orderDetailsUni.onItem()
-                .produceUni(od -> userRepository.findById(od.getId()));
+                .transformToUni(od -> userRepository.findById(od.getId()));
 
         return combine().all().unis(orderDetailsUni, itemQuantityListUni, addressUni, userUni)
                 .combinedWith(OrderDetailsConverter::convertToModel);
@@ -58,17 +58,17 @@ public class OrderDetailsService {
     @Transactional
     public Uni<OrderDetailsModel> saveOrderDetails(Uni<OrderDetailsModel> orderDetailsModel) {
         Uni<OrderDetails> savedOrderDetails = orderDetailsModel.onItem()
-                .produceUni(od -> orderDetailsRepository.saveOrder(
+                .transformToUni(od -> orderDetailsRepository.saveOrder(
                         OrderDetailsConverter.convertToEntity(od))
-                );
+        );
 
         Uni<Map<Long, ProductModel>> productsMapUni = savedOrderDetails.onItem()
-                .produceUni(sod -> getProducts(sod.getProductsJson()));
+                .transformToUni(sod -> getProducts(sod.getProductsJson()));
 
         return combine().all().unis(
                 savedOrderDetails,
                 productsMapUni,
-                orderDetailsModel.onItem().apply(odm -> AddressConverter.convertToEntity(odm.getAddress())),
+                orderDetailsModel.onItem().transform(odm -> AddressConverter.convertToEntity(odm.getAddress())),
                 Uni.createFrom().item(UserEntity.builder().id(1L).build())) //TODO
                 .combinedWith(OrderDetailsConverter::convertToModel);
     }
@@ -80,7 +80,7 @@ public class OrderDetailsService {
 
         List<Long> ids = getProductIdList(cardProducts);
 
-        return itemService.getItemsListByIdList(ids).onItem().apply(itemModels -> {
+        return itemService.getItemsListByIdList(ids).onItem().transform(itemModels -> {
             Map<Long, ProductModel> cardProductsMap = new HashMap<>();
             for (ItemModel im : itemModels) {
                 int amount = cardProducts.stream()

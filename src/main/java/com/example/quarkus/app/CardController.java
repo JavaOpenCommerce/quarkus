@@ -26,7 +26,7 @@ public class CardController {
     private HttpServerRequest request;
 
     private final CardDtoService cardDtoService;
-    private final String COOKIE_NAME = "CardCookie";
+    private static final String COOKIE_NAME = "CardCookie";
 
     public CardController(CardDtoService cardDtoService) {
         this.cardDtoService = cardDtoService;
@@ -48,7 +48,7 @@ public class CardController {
     public Uni<String> addProduct(CardProduct product) {
         addCookieIfNotPresent();
         return cardDtoService.addProductWithAmount(product, request.getCookie(COOKIE_NAME).getValue())
-                .onItem().apply(this::simpleResponse);
+                .onItem().transform(this::simpleResponse);
     }
 
     @PUT
@@ -57,7 +57,7 @@ public class CardController {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<String> increaseProductAmount(@QueryParam("id") Long id) {
         return cardDtoService.increaseProductAmount(id, request.getCookie(COOKIE_NAME).getValue())
-                .onItem().apply(this::simpleResponse);
+                .onItem().transform(this::simpleResponse);
     }
 
     @PUT
@@ -66,7 +66,7 @@ public class CardController {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<String> decreaseProductAmount(@QueryParam("id") Long id) {
         return cardDtoService.decreaseProductAmount(id, request.getCookie(COOKIE_NAME).getValue())
-                .onItem().apply(this::simpleResponse);
+                .onItem().transform(this::simpleResponse);
     }
 
     @DELETE
@@ -75,7 +75,7 @@ public class CardController {
     @Produces(MediaType.APPLICATION_JSON)
     public Uni<String> removeProduct(@QueryParam("id") Long id) {
         return cardDtoService.removeProduct(id, request.getCookie(COOKIE_NAME).getValue())
-                .onItem().apply(this::simpleResponse);
+                .onItem().transform(this::simpleResponse);
     }
 
     @DELETE

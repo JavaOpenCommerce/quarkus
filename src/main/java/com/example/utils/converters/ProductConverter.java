@@ -1,6 +1,7 @@
 package com.example.utils.converters;
 
 import com.example.business.models.ProductModel;
+import com.example.database.entity.CardProduct;
 import com.example.rest.dtos.ProductDto;
 
 public interface ProductConverter {
@@ -16,5 +17,12 @@ public interface ProductConverter {
 
     static ProductModel convertDtoToModel(ProductDto product) {
         return ProductModel.getProduct(ItemConverter.convertDtoToModel(product.getItem()), product.getAmount());
+    }
+
+    static CardProduct convertModelToCardProduct(ProductModel product) {
+        return CardProduct.builder()
+                .itemId(product.getItemModel().getId())
+                .amount(product.getAmount().asInteger())
+                .build();
     }
 }

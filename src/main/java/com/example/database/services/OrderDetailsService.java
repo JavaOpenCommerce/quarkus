@@ -15,7 +15,6 @@ import com.example.utils.converters.OrderDetailsConverter;
 import io.smallrye.mutiny.Uni;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.transaction.Transactional;
 import java.util.*;
 
 import static com.example.utils.converters.JsonConverter.convertToObject;
@@ -55,13 +54,14 @@ public class OrderDetailsService {
                 .combinedWith(OrderDetailsConverter::convertToModel);
     }
 
-    @Transactional
     public Uni<OrderDetailsModel> saveOrderDetails(Uni<OrderDetailsModel> orderDetailsModel) {
         Uni<OrderDetails> savedOrderDetails = orderDetailsModel.onItem()
-                .transformToUni(od -> orderDetailsRepository.saveOrder(
-                        OrderDetailsConverter.convertToEntity(od))
+                .transformToUni(od -> {
+                    System.out.println("Inside save");
+                    return orderDetailsRepository.saveOrder(
+                        OrderDetailsConverter.convertToEntity(od));
+                }
         );
-
         Uni<Map<Long, ProductModel>> productsMapUni = savedOrderDetails.onItem()
                 .transformToUni(sod -> getProducts(sod.getProductsJson()));
 

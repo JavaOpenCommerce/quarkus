@@ -1,15 +1,16 @@
 package com.example.rest.dtos;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
+@Setter
 @Builder
 @EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemDetailDto {
 
     private Long id;

@@ -37,14 +37,14 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
     public Uni<List<OrderDetails>> findOrderDetailsByUserId(Long id) {
         return this.client.preparedQuery("SELECT * FROM ORDERDETAILS od WHERE od.userentity_id = $1")
                 .execute(Tuple.of(id))
-                .onItem().apply(this::getOrderDetailsList);
+                .onItem().transform(this::getOrderDetailsList);
     }
 
     @Override
     public Uni<OrderDetails> findOrderDetailsById(Long id) {
         return this.client.preparedQuery("SELECT * FROM ORDERDETAILS od WHERE od.id = $1")
                 .execute(Tuple.of(id))
-                .onItem().apply(rs -> {
+                .onItem().transform(rs -> {
                     if (isRowSetEmpty(rs)) {
                         return OrderDetails.builder().build();
                     }
@@ -64,10 +64,10 @@ public class OrderDetailsRepositoryImpl implements OrderDetailsRepository {
                 orderDetails.getProductsJson()
         };
         return this.client.preparedQuery("INSERT INTO ORDERDETAILS (creationdate, orderstatus, paymentmethod, " +
-                                        "paymentstatus, address_id, userentity_id, productsjson) " +
-                                        "VALUES($1, $2, $3, $4, $5, $6, $7)")
-                .execute(Tuple.of(args))
-                .onItem().apply(rs -> {
+                                            "paymentstatus, address_id, userentity_id, productsjson) " +
+                                            "VALUES($1, $2, $3, $4, $5, $6, $7)")
+                .execute(Tuple.tuple(List.of(args)))
+                .onItem().transform(rs -> {
                     if (isRowSetEmpty(rs)) {
                         return OrderDetails.builder().build();
                     }

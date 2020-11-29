@@ -7,9 +7,11 @@ import com.example.business.models.UserModel;
 import com.example.database.entity.*;
 import com.example.rest.dtos.OrderDetailsDto;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.example.utils.converters.JsonConverter.convertToJson;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public interface OrderDetailsConverter {
@@ -62,14 +64,19 @@ public interface OrderDetailsConverter {
     //Requires OrderDetailsModel
     static OrderDetails convertToEntity(OrderDetailsModel orderDetailsModel) {
 
+        List<CardProduct> productList = orderDetailsModel.getCard().getProducts().values()
+                .stream()
+                .map(ProductConverter::convertModelToCardProduct)
+                .collect(toList());
+
         return OrderDetails.builder()
                 .creationDate(orderDetailsModel.getCreationDate())
                 .shippingAddressId(orderDetailsModel.getAddress().getId())
                 .orderStatus(OrderStatus.valueOf(orderDetailsModel.getOrderStatus()))
                 .paymentMethod(PaymentMethod.valueOf(orderDetailsModel.getPaymentMethod()))
-                .paymentStatus(PaymentStatus.valueOf(orderDetailsModel.getPaymentMethod()))
+                .paymentStatus(PaymentStatus.valueOf(orderDetailsModel.getPaymentStatus()))
                 .userEntityId(orderDetailsModel.getUser().getId())
-                .productsJson(convertToJson(orderDetailsModel.getCard().getProducts().values()))
+                .productsJson(convertToJson(productList))
                 .build();
     }
 }

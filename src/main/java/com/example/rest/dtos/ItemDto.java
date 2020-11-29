@@ -13,6 +13,7 @@ public class ItemDto {
 
     private final Long id;
     private final String name;
+    private final int stock;
     private BigDecimal valueGross;
     private ImageDto image;
     private double vat;

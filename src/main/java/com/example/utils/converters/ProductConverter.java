@@ -13,4 +13,8 @@ public interface ProductConverter {
                 .valueNett(product.getValueNett().asDecimal())
                 .build();
     }
+
+    static ProductModel convertDtoToModel(ProductDto product) {
+        return ProductModel.getProduct(ItemConverter.convertDtoToModel(product.getItem()), product.getAmount());
+    }
 }

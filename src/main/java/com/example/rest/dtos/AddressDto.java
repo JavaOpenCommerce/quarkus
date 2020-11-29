@@ -10,6 +10,7 @@ import lombok.Getter;
 public class AddressDto {
 
     private Long id;
+    private Long userId;
     private String street;
     private String local;
     private String city;

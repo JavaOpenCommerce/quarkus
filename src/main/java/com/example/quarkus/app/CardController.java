@@ -7,7 +7,7 @@ import com.example.rest.services.CardDtoService;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.Cookie;
 import io.vertx.core.http.HttpServerRequest;
-import lombok.extern.jbosslog.JBossLog;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import static com.example.statics.MessagesStore.OK;
 import static java.util.Optional.ofNullable;
 
-@JBossLog
+@Slf4j
 @Path("card")
 public class CardController {
 

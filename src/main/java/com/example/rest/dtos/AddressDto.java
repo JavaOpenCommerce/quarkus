@@ -2,10 +2,8 @@ package com.example.rest.dtos;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Builder
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDto {

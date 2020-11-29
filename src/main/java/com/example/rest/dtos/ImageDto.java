@@ -2,11 +2,8 @@ package com.example.rest.dtos;
 
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Builder
-@ToString
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImageDto {

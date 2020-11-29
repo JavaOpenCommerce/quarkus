@@ -4,10 +4,8 @@ import lombok.*;
 
 import java.util.Locale;
 
-@Getter
-@Setter
+@Data
 @Builder
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDto {

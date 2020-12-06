@@ -48,11 +48,10 @@ public class StoreService {
     }
 
     public Uni<PageModel<ItemModel>> getFilteredItemsPage(SearchRequest request) {
-        return getFilteredResults(request).onItem().transformToUni(results ->
+        return getFilteredResults(request).flatMap(results ->
                 itemService
                         .getItemsListByIdList(results.getLeft())
-                        .onItem()
-                        .transform(items -> {
+                        .map(items -> {
                             List<ItemModel> filteredList = items.stream()
                                     .filter(i -> isValidCategory(i.getCategory()))
                                     .collect(toList());
@@ -66,7 +65,7 @@ public class StoreService {
     }
 
     public Uni<List<CategoryModel>> getAllCategories() {
-        return categoryRepository.getAll().onItem().transform(categories ->
+        return categoryRepository.getAll().map(categories ->
                 categories.stream()
                         .filter(cat -> cat.getDetails().stream()
                                 .allMatch(detail -> !"shipping".equalsIgnoreCase(detail.getName())))
@@ -75,7 +74,7 @@ public class StoreService {
     }
 
     public Uni<List<ProducerModel>> getAllProducers() {
-        return producerRepository.getAll().onItem().transform(producers ->
+        return producerRepository.getAll().map(producers ->
                 producers.stream()
                         .map(ProducerConverter::convertToModel)
                         .collect(toList()));
@@ -84,7 +83,7 @@ public class StoreService {
     private Uni<Pair<List<Long>, Integer>> getFilteredResults(SearchRequest request) {
 
         return searchService
-                .searchItemsBySearchRequest(request).onItem().transform(json -> {
+                .searchItemsBySearchRequest(request).map(json -> {
 
                     //null check on json
                     if (json == null || json.isEmpty() || json.getJsonObject("hits") == null

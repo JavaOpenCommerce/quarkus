@@ -41,8 +41,8 @@ public class CardService {
     }
 
     public Uni<CardModel> getCard(String id) {
-        return cardRepository.getCardList(id).onItem().transformToUni(products ->
-                getCardProducts(products).onItem().transform(CardModel::getInstance));
+        return cardRepository.getCardList(id).flatMap(products ->
+                getCardProducts(products).map(CardModel::getInstance));
     }
 
     public Uni<String> addProductWithAmount(CardProduct product, String id) {
@@ -92,7 +92,7 @@ public class CardService {
                 .pageSize(20)
                 .build();
         return getFilteredResults(searchRequest)
-                .onItem().transformToUni(itemService::getItemsListByIdList);
+                .flatMap(itemService::getItemsListByIdList);
     }
 
     public AddressModel getAddressModel(Long id) {
@@ -104,7 +104,7 @@ public class CardService {
     }
 
     private Uni<List<Long>> getFilteredResults(SearchRequest request) {
-        return searchService.searchItemsBySearchRequest(request).onItem().transform(json ->
+        return searchService.searchItemsBySearchRequest(request).map(json ->
                 ofNullable(json)
                         .map(j -> j.getJsonObject("hits"))
                         .map(hits -> hits.getJsonArray("hits"))
@@ -120,7 +120,7 @@ public class CardService {
     private Uni<Map<Long, ProductModel>> getCardProducts(List<CardProduct> products) {
         List<Long> ids = products.stream().map(CardProduct::getItemId).collect(toList());
 
-        return itemService.getItemsListByIdList(ids).onItem().transform(itemModels -> {
+        return itemService.getItemsListByIdList(ids).map(itemModels -> {
             Map<Long, ProductModel> cardProducts = new HashMap<>();
             for (ItemModel im : itemModels) {
 

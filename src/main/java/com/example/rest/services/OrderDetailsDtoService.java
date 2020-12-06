@@ -21,18 +21,17 @@ public class OrderDetailsDtoService {
     }
 
     public Uni<OrderDetailsDto> getOrderDetailsById(Long id) {
-        return orderDetailsService.getOrderDetailsById(id).onItem().transform(od ->
+        return orderDetailsService.getOrderDetailsById(id).map(od ->
                 OrderDetailsConverter.convertToDto(od, languageResolver.getLanguage(), languageResolver.getDefault()));
     }
 
     public Uni<OrderDetailsDto> saveOrderDetails(Uni<OrderDetailsDto> orderDetailsDtoUni) {
 
         Uni<OrderDetailsModel> savedDetailsUni = orderDetailsService.saveOrderDetails(
-                orderDetailsDtoUni.onItem()
-                        .transform(OrderDetailsConverter::convertDtoToModel)
+                orderDetailsDtoUni.map(OrderDetailsConverter::convertDtoToModel)
         );
 
-        return savedDetailsUni.onItem().transform(od ->
+        return savedDetailsUni.map(od ->
                 OrderDetailsConverter.convertToDto(od, languageResolver.getLanguage(), languageResolver.getDefault())
         );
     }

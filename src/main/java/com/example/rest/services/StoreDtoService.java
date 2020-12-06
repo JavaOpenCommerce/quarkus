@@ -48,14 +48,14 @@ public class StoreDtoService {
     }
 
     public Uni<List<CategoryDto>> getAllCategories() {
-        return storeService.getAllCategories().onItem().transform(categoryModels ->
+        return storeService.getAllCategories().map(categoryModels ->
                 categoryModels.stream()
                         .map(cat -> CategoryConverter.convertToDto(cat, langRes.getLanguage(), langRes.getDefault()))
                         .collect(toList()));
     }
 
     public Uni<List<ProducerDto>> getAllProducers() {
-        return storeService.getAllProducers().onItem().transform(producerModels ->
+        return storeService.getAllProducers().map(producerModels ->
                 producerModels.stream()
                         .map(prod -> ProducerConverter.convertToDto(prod, langRes.getLanguage(), langRes.getDefault()))
                         .collect(toList()));

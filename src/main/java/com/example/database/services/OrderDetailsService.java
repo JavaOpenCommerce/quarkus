@@ -84,7 +84,8 @@ public class OrderDetailsService {
 
     private void updateItemStocks(Map<Long, ProductModel> productsMap) {
 
-        Map<Long, Integer> idAmountMap = productsMap.keySet().stream()
+         productsMap.forEach((id, product) ->
+                this.itemService.changeStock(id, product.getAmount().asInteger()).await().indefinitely()
                 .collect(toMap(
                         key -> key,
                         key -> productsMap.get(key).getAmount().asInteger())

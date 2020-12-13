@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.utils.converters.JsonConverter.convertToObject;
 import static io.smallrye.mutiny.Uni.combine;
@@ -61,11 +62,10 @@ public class OrderDetailsService {
     public Uni<OrderDetailsModel> saveOrderDetails(Uni<OrderDetailsModel> orderDetailsModel) {
 
         return orderDetailsModel.flatMap(od -> {
+            updateItemStocks(od.getCard().getProducts());
 
             Uni<OrderDetails> savedOrderDetails = orderDetailsRepository
                 .saveOrder(OrderDetailsConverter.convertToEntity(od));
-
-            // + decrease/change stocks
 
             return savedOrderDetails
                     .flatMap(sod -> {
@@ -80,6 +80,19 @@ public class OrderDetailsService {
                         );
                     });
         });
+    }
+
+    private void updateItemStocks(Map<Long, ProductModel> productsMap) {
+
+        Map<Long, Integer> idAmountMap = productsMap.keySet().stream()
+                .collect(Collectors.toMap(
+                        key -> key,
+                        (Long key) -> productsMap.get(key).getAmount().asInteger())
+                );
+
+        idAmountMap.forEach((id, amount) ->
+                itemService.changeStock(id, amount).await().indefinitely()
+        );
     }
 
     private Uni<Map<Long, ProductModel>> getProducts(String productsJson) {

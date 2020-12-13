@@ -120,7 +120,7 @@ public class ItemRepositoryImpl implements ItemRepository {
                 .execute(Tuple.of(id))
                 .map(rs -> {
                     if (isRowSetEmpty(rs)) {
-                        return 0;
+                        return -1;
                     }
                     return rs.iterator().next().getInteger("stock");
                 });
@@ -132,8 +132,7 @@ public class ItemRepositoryImpl implements ItemRepository {
                 .execute(Tuple.of(stock, id))
                 .map(rs -> {
                     if (isRowSetEmpty(rs)) {
-                        return 0;
-                        // or throw maybe?
+                        return -1;
                     }
                     return rs.iterator().next().getInteger("stock");
                 });

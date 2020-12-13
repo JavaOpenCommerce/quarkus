@@ -18,11 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.utils.converters.JsonConverter.convertToObject;
 import static io.smallrye.mutiny.Uni.combine;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 @ApplicationScoped
@@ -85,9 +85,9 @@ public class OrderDetailsService {
     private void updateItemStocks(Map<Long, ProductModel> productsMap) {
 
         Map<Long, Integer> idAmountMap = productsMap.keySet().stream()
-                .collect(Collectors.toMap(
+                .collect(toMap(
                         key -> key,
-                        (Long key) -> productsMap.get(key).getAmount().asInteger())
+                        key -> productsMap.get(key).getAmount().asInteger())
                 );
 
         idAmountMap.forEach((id, amount) ->
